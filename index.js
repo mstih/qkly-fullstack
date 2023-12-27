@@ -1,15 +1,26 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
-
 const app = express();
-
-// Routes
+const cors = require("cors");
+const db = require("./db/dbConnection");
 const users = require("./routes/users");
 const connections = require("./routes/connections");
+const saved = require("./routes/saved");
 
+// Middleware
+app.use(cors({ methods: ["GET", "POST"] }));
+
+// Endpoints for routes
 app.use("/users", users);
 app.use("/connections", connections);
+app.use("/saved", saved);
 
+// TODO: Static express files for frontend
+
+// For now a simple response to / route
+app.get("/", (req, res) => {
+  res.send("Hello, here will be the frontend.");
+});
 // Server starting and listening
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}...`);
