@@ -6,6 +6,7 @@ const db = require("./db/dbConnection");
 const users = require("./routes/users");
 const connections = require("./routes/connections");
 const saved = require("./routes/saved");
+const kraji = require("./routes/kraj");
 
 // Middleware
 app.use(cors({ methods: ["GET", "POST"] }));
@@ -14,6 +15,7 @@ app.use(cors({ methods: ["GET", "POST"] }));
 app.use("/users", users);
 app.use("/connections", connections);
 app.use("/saved", saved);
+app.use("/kraji", kraji);
 
 // TODO: Static express files for frontend
 
