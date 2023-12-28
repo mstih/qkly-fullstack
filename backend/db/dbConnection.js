@@ -19,7 +19,7 @@ dbConnection.connect((error) => {
     );
     return;
   }
-  console.log("Connected to database was successfully established.");
+  console.log("Connected to the database\x1b[32m successfully.\x1b[0m");
 });
 
 // Stores all the database response data as a type OBJECT
@@ -27,7 +27,7 @@ let dataVar = {};
 
 // LOGIN
 // Purpose: Check if the user exists in the database and get all the details about the user
-dataVar.login = (email) => {
+dataVar.userExists = (email) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(
       "SELECT * FROM Uporabnik WHERE u_mail = ?",
@@ -45,9 +45,8 @@ dataVar.login = (email) => {
 dataVar.register = (name, surname, email, pass) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(
-      "INSERT INTO Uporabnik (u_id, u_ime, u_priimek, u_mail, u_geslo, u_datumReg) VALUES (NULL, ? ,?, CAST(? AS CHAR(60)),currentTimestamp())"[
-        (name, surname, email, pass)
-      ],
+      "INSERT INTO Uporabnik (u_ime, u_priimek, u_mail, u_geslo) VALUES (?,?,?,CAST(? AS CHAR(60)))",
+      [name, surname, email, pass],
       (error, result) => {
         if (error) return reject(error);
         return resolve(result);
@@ -57,6 +56,7 @@ dataVar.register = (name, surname, email, pass) => {
 };
 
 // TODO: Create a function that searches for all connections in the POVEZAVA table at the specific date and combination of two cities
+// TO FINISH WITH
 dataVar.searchConnections = (date, cityFrom, cityTo) => {
   return new Promise((resolve, reject) => {
     dbConnection.query("", [], (error, result) => {
@@ -66,14 +66,33 @@ dataVar.searchConnections = (date, cityFrom, cityTo) => {
   });
 };
 
-// TODO: Create a function that searches for a single connection in POVEZAVA table with route id
-
 // SAVED CONNECTIONS
 // Purpose: Get all the saved connections for a specific user
+// TODO: FIGURE OUT HOW TO CALCULATE TIME DIFFERENCE
 dataVar.getSaved = (id) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(
-      "SELECT * FROM Shrani WHERE u_id = ?",
+      `SELECT 
+          S.*, 
+          P.*, 
+          K1.k_ime AS odhod, 
+          K2.k_ime AS prihod,
+          PR.p_ime AS prevoznik_ime,
+          V.v_opis AS vozilo_opis
+      FROM
+          Shrani S
+      JOIN
+          Povezava P ON S.r_id = P.r_id
+      JOIN
+          Kraj K1 ON P.r_odhod = K1.k_id
+      JOIN
+          Kraj K2 ON P.r_prihod = K2.k_id
+      JOIN
+          Prevoznik PR ON P.r_id = PR.p_id
+      JOIN
+          Vozilo V ON P.r_vozilo = V.v_id
+      WHERE
+      S.u_id = ?;`,
       id,
       (error, result) => {
         if (error) return reject(error);
@@ -83,9 +102,21 @@ dataVar.getSaved = (id) => {
   });
 };
 
-// TODO: Create a function that adds the connection to the SHRANI table
+// SAVE CONNECTION
+// Purpose: Save a connection to the database linked to a specific user
+dataVar.saveConnection = (uID, rID) => {
+  return new Promise((resolve, reject) => {
+    "INSERT INTO Shrani (u_id, p_id) VALUES (?, ?)",
+      [uID, rID],
+      (error, result) => {
+        if (error) return reject(error);
+        return resolve(result);
+      };
+  });
+};
 
-// TODO: Create a function that deletes a saved connection from SHRANI table
+// DELETE SAVED
+// Purpose: Delete a saved connection from the database
 dataVar.deleteSaved = (uID, pID) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(

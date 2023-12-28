@@ -9,6 +9,7 @@ const saved = require("./routes/saved");
 const kraji = require("./routes/kraj");
 
 // Middleware
+app.use(express.json());
 app.use(cors({ methods: ["GET", "POST"] }));
 
 // Endpoints for routes
