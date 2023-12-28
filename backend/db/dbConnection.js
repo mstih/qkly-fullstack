@@ -59,10 +59,30 @@ dataVar.register = (name, surname, email, pass) => {
 // TO FINISH WITH
 dataVar.searchConnections = (cityFrom, cityTo, date) => {
   return new Promise((resolve, reject) => {
-    dbConnection.query("", [], (error, result) => {
-      if (error) return reject(error);
-      return resolve(result);
-    });
+    // Compare to parameters and send all the results(with full data)
+    dbConnection.query(
+      `SELECT P.r_id, P.r_odhod, P.r_prihod, 
+      P.r_casOdhod, P.r_casPrihod, P.r_cena AS cena,
+      K1.k_ime AS k_odhod, 
+      K2.k_ime AS k_prihod,
+      V.v_id,
+      V.v_opis AS vozilo, 
+      PR.p_id,
+      PR.p_ime AS izvajalec,
+      PR.p_link AS link,
+      PR.p_kontakt AS kontakt
+      FROM Povezava P
+      JOIN Kraj K1 ON K1.k_id = P.r_odhod
+      JOIN Kraj K2 ON K2.k_id = P.r_prihod
+      JOIN Vozilo V ON V.v_id = P.r_vozilo
+      JOIN Prevoznik PR ON PR.p_id = V.v_izvajalec
+      WHERE P.r_casOdhod LIKE ? AND P.r_odhod = ? AND P.r_prihod = ?`,
+      [date, cityFrom, cityTo],
+      (error, result) => {
+        if (error) return reject(error);
+        return resolve(result);
+      }
+    );
   });
 };
 
