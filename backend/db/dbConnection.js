@@ -57,12 +57,43 @@ dataVar.register = (name, surname, email, pass) => {
 
 // TODO: Create a function that searches for all connections in the POVEZAVA table at the specific date and combination of two cities
 // TO FINISH WITH
-dataVar.searchConnections = (date, cityFrom, cityTo) => {
+dataVar.searchConnections = (cityFrom, cityTo, date) => {
   return new Promise((resolve, reject) => {
     dbConnection.query("", [], (error, result) => {
       if (error) return reject(error);
       return resolve(result);
     });
+  });
+};
+
+// TODO: Create a function that searches for a specific connection by ID
+dataVar.getConnectionData = (id) => {
+  return new Promise((resolve, reject) => {
+    dbConnection.query(
+      `
+      SELECT P.r_casOdhod AS cas1,
+      P.r_casPrihod AS cas2,
+      K1.k_ime AS odhod,
+      K2.k_ime AS prihod,
+      K1.k_lokacija AS lokacija,
+      V.v_opis AS vozilo,
+      PR.p_ime AS prevoznik,
+      PR.p_link AS link,
+      PR.p_kontakt AS kontakt,
+      P.r_cena AS cena
+      FROM Povezava P
+      JOIN Kraj K1 ON P.r_odhod = K1.k_id
+      JOIN Kraj K2 ON P.r_prihod = K2.k_id
+      JOIN Vozilo V ON P.r_vozilo = V.v_id
+      JOIN Prevoznik PR ON V.v_izvajalec = PR.p_id
+      WHERE P.r_id = ?;
+    `,
+      [id],
+      (error, result) => {
+        if (error) return reject(error);
+        return resolve(result);
+      }
+    );
   });
 };
 
@@ -73,12 +104,12 @@ dataVar.getSaved = (id) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(
       `SELECT 
-          S.*, 
+          S.u_id, S.r_id, 
           P.*, 
-          K1.k_ime AS odhod, 
-          K2.k_ime AS prihod,
-          PR.p_ime AS prevoznik_ime,
-          V.v_opis AS vozilo_opis
+          K1.k_ime AS k_odhod, 
+          K2.k_ime AS k_prihod,
+          V.v_opis AS vozilo,
+          PR.p_ime, PR.p_link, PR.p_kontakt
       FROM
           Shrani S
       JOIN
@@ -104,14 +135,16 @@ dataVar.getSaved = (id) => {
 
 // SAVE CONNECTION
 // Purpose: Save a connection to the database linked to a specific user
-dataVar.saveConnection = (uID, rID) => {
+dataVar.saveConnection = (uid, rid) => {
   return new Promise((resolve, reject) => {
-    "INSERT INTO Shrani (u_id, p_id) VALUES (?, ?)",
-      [uID, rID],
+    dbConnection.query(
+      "INSERT INTO Shrani (u_id, r_id) VALUES (?, ?)",
+      [uid, rid],
       (error, result) => {
         if (error) return reject(error);
         return resolve(result);
-      };
+      }
+    );
   });
 };
 
@@ -120,7 +153,22 @@ dataVar.saveConnection = (uID, rID) => {
 dataVar.deleteSaved = (uID, pID) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(
-      "DELETE FROM Shrani WHERE u_id = ? AND p_id = ?",
+      "DELETE FROM Shrani WHERE u_id = ? AND r_id = ?",
+      [uID, pID],
+      (error, result) => {
+        if (error) return reject(error);
+        return resolve(result);
+      }
+    );
+  });
+};
+
+// CHECK SAVED CONNECTION
+// Purpose: Check if a connection is already saved
+dataVar.checkSaved = (uID, pID) => {
+  return new Promise((resolve, reject) => {
+    dbConnection.query(
+      "SELECT * FROM Shrani WHERE u_id = ? AND r_id = ?",
       [uID, pID],
       (error, result) => {
         if (error) return reject(error);
