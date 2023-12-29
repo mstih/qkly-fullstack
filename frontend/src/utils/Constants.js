@@ -1,0 +1,9 @@
+export const HOME = "home";
+export const ABOUT = "about";
+export const SEARCH = "search";
+export const LEARN_MORE = "learnMore";
+export const LOGIN = "login";
+export const REGISTER = "register";
+export const SAVED = "saved";
+export const PROFILE = "profile";
+export const EDIT_PROFILE = "editProfile";
