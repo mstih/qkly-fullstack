@@ -24,18 +24,17 @@ users.post("/login", async (req, res, next) => {
               " - LOGIN at:  " +
               new Date().toLocaleString()
           );
-          res.status(200);
           //req.session.user = queryResponse;
           //req.session.loggedIN = true;
-          res.send({
+          res.status(200).send({
             user: queryResponse[0],
-            status: { success: true, msg: "Logged in" },
+            status: { success: true, message: "Logged in" },
           });
         } else {
           res.status(200);
           res.send({
             user: null,
-            status: { success: false, msg: "Password incorrect" },
+            status: { success: false, message: "Password incorrect" },
           });
           console.log("Login error: Password incorrect");
         }
@@ -45,7 +44,7 @@ users.post("/login", async (req, res, next) => {
           user: null,
           status: {
             success: false,
-            msg: "Email " + email + " is not registered.",
+            message: "Email " + email + " is not registered.",
           },
         });
         console.log("Login error: Email " + email + " is not registered.");
@@ -55,7 +54,7 @@ users.post("/login", async (req, res, next) => {
       res.send({
         logged: false,
         user: null,
-        status: { success: false, msg: "Please fill in all the fields" },
+        status: { success: false, message: "Please fill in all the fields" },
       });
       console.log("Login error: Missing fields");
     }
@@ -68,7 +67,16 @@ users.post("/login", async (req, res, next) => {
   }
 });
 
-// TODO: LOGOUT function
+// LOGOUT
+// Purpose: Destroy the session and log out the user
+users.get("/logout", async (req, res, next) => {
+  try {
+    // session destroy
+    // res.json({success: true, message: "Logged out"})
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
 
 // REGISTER
 // Purpose: Check for all the fields and register a new user
@@ -114,6 +122,12 @@ users.post("/register", async (req, res, next) => {
     res.send({ status: { success: false, message: "Server error" } });
     next();
   }
+});
+
+// SESSION
+// Purpose: Return info about logged user
+users.get("/session", async (req, res, next) => {
+  // Return session info
 });
 
 module.exports = users;
