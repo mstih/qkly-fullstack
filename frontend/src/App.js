@@ -1,9 +1,20 @@
 import React from "react";
-import { HOME, LOGIN, REGISTER, ABOUT } from "./utils/Constants.js";
+import {
+  HOME,
+  LOGIN,
+  SIGNUP,
+  ABOUT,
+  SEARCH,
+  PROFILE,
+  SAVED,
+} from "./utils/Constants.js";
 import Footer from "./components/Footer.jsx";
 import HomeView from "./components/HomeView.jsx";
-import LoginView from "./components/LoginView.jsx";
 import AboutView from "./components/AboutView.jsx";
+import SearchView from "./components/SearchView.jsx";
+import LoginView from "./components/LoginView.jsx";
+import SignUpView from "./components/SignUpView.jsx";
+import SavedView from "./components/SavedView.jsx";
 
 class App extends React.Component {
   constructor(props) {
@@ -25,8 +36,14 @@ class App extends React.Component {
         return <HomeView />;
       case ABOUT:
         return <AboutView />;
+      case SEARCH:
+        return <SearchView />;
       case LOGIN:
         return <LoginView getLoginDataFromChild={this.getLogin} />;
+      case SIGNUP:
+        return <SignUpView />;
+      case SAVED:
+        return <SavedView />;
       default:
         return <HomeView />;
     }
@@ -77,8 +94,8 @@ class App extends React.Component {
                 id="navbarSupportedContent"
               >
                 {/* About, search and other links */}
-                <ul className="navbar-nav mb-lg-2 ">
-                  <li className="nav-item">
+                <ul className="navbar-nav mt-3 mt-lg-0 mb-lg-0 ">
+                  <li className="nav-item mb-3 mb-lg-0 ">
                     <a
                       onClick={this.setView.bind(this, { view: ABOUT })}
                       className={`nav-link fs-5 mx-3 p-2 mh-100 ${
@@ -91,30 +108,75 @@ class App extends React.Component {
                       About
                     </a>
                   </li>
-                  <li className="nav-item">
-                    <a className="nav-link fs-5 mx-3 p-2" href="#">
+                  <li className="nav-item mb-3 mb-lg-0">
+                    <a
+                      onClick={this.setView.bind(this, { view: SEARCH })}
+                      className={`nav-link fs-5 mx-3 p-2 mh-100 ${
+                        this.state.currentView === SEARCH
+                          ? "greenBorderSmall"
+                          : ""
+                      } `}
+                      href="#"
+                    >
                       Search
                     </a>
                   </li>
+                  {this.state.user != null ? (
+                    <li className="nav-item mb-3 mb-lg-0">
+                      <a
+                        onClick={this.setView.bind(this, { view: SAVED })}
+                        className={`nav-link fs-5 mx-3 p-2 mh-100 ${
+                          this.state.currentView === SAVED
+                            ? "greenBorderSmall"
+                            : ""
+                        } `}
+                        href="#"
+                      >
+                        Saved Routes
+                      </a>
+                    </li>
+                  ) : null}
                 </ul>
                 {/* Login, register and profile links on the rightmost */}
                 <ul className="navbar-nav ms-auto mb-2 mb-lg-0 mx-2">
-                  <li className="nav-item">
-                    <a
-                      onClick={this.setView.bind(this, { view: LOGIN })}
-                      className="btn bg-white rounded-pill px-4"
-                      href="#"
-                    >
-                      LOGIN
-                    </a>
-                    <a
-                      onClick={this.setView.bind(this, { page: REGISTER })}
-                      className="btn btn-primary rounded-pill px-3 mx-2"
-                      href="#"
-                    >
-                      SIGN UP
-                    </a>
-                  </li>
+                  {this.state.user == null ? (
+                    <li className="nav-item">
+                      <a
+                        onClick={this.setView.bind(this, { view: LOGIN })}
+                        className="btn bg-white rounded-pill px-4"
+                        href="#"
+                      >
+                        LOGIN
+                      </a>
+                      <a
+                        onClick={this.setView.bind(this, { view: SIGNUP })}
+                        className="btn btn-primary rounded-pill px-3 mx-2"
+                        href="#"
+                      >
+                        SIGN UP
+                      </a>
+                    </li>
+                  ) : (
+                    <li className="nav-item mx-0">
+                      <a
+                        // ONCLICK LOGOUT AND GO TO HOME PAGE
+                        className="btn bg-white rounded-pill px-3"
+                        href="#"
+                      >
+                        LOGOUT
+                      </a>
+                      <a
+                        onClick={this.setView.bind(this, { view: PROFILE })}
+                        className="mx-2"
+                        href="#"
+                      >
+                        <img
+                          style={{ height: "50px" }}
+                          src="./assets/images/profile-green.png"
+                        ></img>
+                      </a>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
