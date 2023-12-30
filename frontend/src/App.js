@@ -1,23 +1,56 @@
 import React from "react";
-import { HOME } from "./utils/Constants.js";
+import { HOME, LOGIN, REGISTER, ABOUT } from "./utils/Constants.js";
+import Footer from "./components/Footer.jsx";
 import HomeView from "./components/HomeView.jsx";
+import LoginView from "./components/LoginView.jsx";
+import AboutView from "./components/AboutView.jsx";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       currentView: HOME,
+      status: {
+        success: null,
+        message: "",
+      },
+      user: null,
     };
   }
 
+  getView(state) {
+    const view = this.state.currentView;
+    switch (view) {
+      case HOME:
+        return <HomeView />;
+      case ABOUT:
+        return <AboutView />;
+      case LOGIN:
+        return <LoginView getLoginDataFromChild={this.getLogin} />;
+      default:
+        return <HomeView />;
+    }
+  }
+
+  setView(obj) {
+    this.setState((this.state.status = { success: null, message: "" }));
+    this.setState({ currentView: obj.view });
+    console.log("View set to: " + this.state.currentView);
+  }
+
+  // Allows the data to be passed from the login component to the app component
+  getLogin = (data) => {
+    this.setState((this.state.user = data.user));
+  };
+
   render() {
     return (
-      <div id="APP" className="container-fluid m-0 ">
-        <div id="menu" className="row">
-          <nav className="navbar navbar-expand-lg navbar-dark bg-second pl-4 pr-2 navbar-border">
+      <div id="APP" className="d-flex flex-column min-vh-100">
+        <div id="menu">
+          <nav className="navbar navbar-expand-lg navbar-dark bg-second navbar-border px-3 w-100">
             <div className="container-fluid">
               <a
-                //onClick={() => this.changeView({ currentView: HOME })}
+                onClick={() => this.setView({ view: HOME })}
                 className="navbar-brand fw-bold fs-4"
                 href="#"
               >
@@ -27,7 +60,6 @@ class App extends React.Component {
                   className="logo-image"
                 ></img>
               </a>
-
               <button
                 className="navbar-toggler"
                 type="button"
@@ -39,13 +71,66 @@ class App extends React.Component {
               >
                 <span class="navbar-toggler-icon"></span>
               </button>
+
+              <div
+                className="collapse navbar-collapse"
+                id="navbarSupportedContent"
+              >
+                {/* About, search and other links */}
+                <ul className="navbar-nav mb-lg-2 ">
+                  <li className="nav-item">
+                    <a
+                      onClick={this.setView.bind(this, { view: ABOUT })}
+                      className={`nav-link fs-5 mx-3 p-2 mh-100 ${
+                        this.state.currentView === ABOUT
+                          ? "greenBorderSmall"
+                          : ""
+                      }`}
+                      href="#"
+                    >
+                      About
+                    </a>
+                  </li>
+                  <li className="nav-item">
+                    <a className="nav-link fs-5 mx-3 p-2" href="#">
+                      Search
+                    </a>
+                  </li>
+                </ul>
+                {/* Login, register and profile links on the rightmost */}
+                <ul className="navbar-nav ms-auto mb-2 mb-lg-0 mx-2">
+                  <li className="nav-item">
+                    <a
+                      onClick={this.setView.bind(this, { view: LOGIN })}
+                      className="btn bg-white rounded-pill px-4"
+                      href="#"
+                    >
+                      LOGIN
+                    </a>
+                    <a
+                      onClick={this.setView.bind(this, { page: REGISTER })}
+                      className="btn btn-primary rounded-pill px-3 mx-2"
+                      href="#"
+                    >
+                      SIGN UP
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </nav>
         </div>
-        <div id="view" className="row">
-          {/* {this.getView(this.state)} */}
-          <HomeView />
+        <div id="view" className="w-100">
+          {this.getView(this.state.currentView)}
+          {this.state.status.success ? (
+            <div className="d-flex justify-content-center">
+              <p className="alert alert-success w-50 mt-2">
+                {this.state.status.message}
+              </p>
+            </div>
+          ) : null}
         </div>
+        <Footer />
       </div>
     );
   }
