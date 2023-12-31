@@ -27,13 +27,15 @@ class App extends React.Component {
       },
       user: null,
     };
+    // Not sure but passing views does not work otherwise
+    this.setView = this.setView.bind(this);
   }
 
   getView(state) {
     const view = this.state.currentView;
     switch (view) {
       case HOME:
-        return <HomeView />;
+        return <HomeView setView={this.setView} />;
       case ABOUT:
         return <AboutView />;
       case SEARCH:
@@ -50,8 +52,10 @@ class App extends React.Component {
   }
 
   setView(obj) {
-    this.setState((this.state.status = { success: null, message: "" }));
-    this.setState({ currentView: obj.view });
+    this.setState({
+      status: { success: null, message: "" },
+      currentView: obj.view,
+    });
     console.log("View set to: " + this.state.currentView);
   }
 
@@ -173,6 +177,7 @@ class App extends React.Component {
                         <img
                           style={{ height: "50px" }}
                           src="./assets/images/profile-green.png"
+                          alt="profile"
                         ></img>
                       </a>
                     </li>

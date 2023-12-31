@@ -18,7 +18,7 @@ const AboutView = () => {
                 </div>
             </div>
             <div className='row justify-content-center mt-5'>
-                <div className='col-12 col-md-8'>
+                <div className='col-12 col-md-8 mb-4'>
                     <h2 className='blackBorderSmall pb-2'>How to Use Qkly</h2>
                     <p className='lead'>
                         1. Enter your starting city and destination in the search bar.
