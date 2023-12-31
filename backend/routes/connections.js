@@ -12,12 +12,12 @@ connections.post("/search", async (req, res) => {
   try {
     const k1 = req.body.k1;
     const k2 = req.body.k2;
-    const dateTime = req.body.date;
+    const dateTime = req.body.date + "%";
     // Sets the date to be in the right format for searching in sql
     const date = dateTime.split("T")[0] + "%";
-    if (k1 && k2 && date) {
-      const queryResponse = await db.searchConnections(k1, k2, date);
-      if (queryResponse.length == 0) {
+    if (k1 && k2 && dateTime) {
+      const queryResponse = await db.searchConnections(k1, k2, dateTime);
+      if (queryResponse.length === 0) {
         res.status(200).send({
           status: { success: true, message: "No connections found." },
         });

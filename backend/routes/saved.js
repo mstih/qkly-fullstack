@@ -65,24 +65,24 @@ saved.post("/save_connection", async (req, res) => {
     // Checks if both ids are present in the request
     if (uID && rID) {
       const isAllreadySaved = await db.checkSaved(uID, rID);
-      if (!isAllreadySaved) {
+      if (!isAllreadySaved || isAllreadySaved.length === 0) {
         const queryResponse = await db.saveConnection(uID, rID);
         if (queryResponse) {
           res
             .status(200)
             .send({ status: { success: true, message: "Connection saved." } });
         } else {
-          res.status(200).send({
+          res.status(201).send({
             status: { success: false, message: "Connection not saved." },
           });
         }
       } else {
-        res.status(200).send({
+        res.status(201).send({
           status: { success: false, message: "Connection allready saved." },
         });
       }
     } else {
-      res.status(200).send({
+      res.status(201).send({
         status: { success: false, message: "No user id or route id provided." },
       });
     }
