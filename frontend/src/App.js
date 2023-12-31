@@ -39,7 +39,7 @@ class App extends React.Component {
       case ABOUT:
         return <AboutView />;
       case SEARCH:
-        return <SearchView />;
+        return <SearchView user={this.state.user} />;
       case LOGIN:
         return <LoginView getLoginDataFromChild={this.getLogin} />;
       case SIGNUP:
