@@ -7,6 +7,7 @@ import {
   SEARCH,
   PROFILE,
   SAVED,
+  CHANGEPASS,
 } from "./utils/Constants.js";
 import Footer from "./components/Footer.jsx";
 import HomeView from "./components/HomeView.jsx";
@@ -16,6 +17,7 @@ import LoginView from "./components/LoginView.jsx";
 import SignUpView from "./components/SignUpView.jsx";
 import SavedView from "./components/SavedView.jsx";
 import ProfileView from "./components/ProfileView.jsx";
+import ChangePassView from "./components/ChangePassView.jsx";
 
 class App extends React.Component {
   constructor(props) {
@@ -53,18 +55,26 @@ class App extends React.Component {
       case SAVED:
         return <SavedView userId={this.state.user.u_id} />;
       case PROFILE:
-        return <ProfileView userData={this.state.user} />;
+        return (
+          <ProfileView userData={this.state.user} setView={this.setView} />
+        );
+      case CHANGEPASS:
+        return (
+          <ChangePassView userData={this.state.user} setView={this.setView} />
+        );
       default:
         return <HomeView />;
     }
   }
 
   setView(obj) {
-    this.setState({
-      status: { success: null, message: "" },
-      currentView: obj.view,
-    });
-    console.log("View set to: " + this.state.currentView);
+    this.setState(
+      {
+        status: { success: null, message: "" },
+        currentView: obj.view,
+      },
+      () => console.log("View changed to: " + this.state.currentView)
+    );
   }
 
   // Allows the data to be passed from the login component to the app component

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CHANGEPASS } from '../utils/Constants';
 
 class ProfileView extends React.Component {
     constructor(props) {
@@ -29,7 +30,7 @@ class ProfileView extends React.Component {
                                     <div className="col-md-6">
                                         <p className='h4 py-3'><strong>Registration Date:</strong> {new Date(u_datumReg).toLocaleDateString()}</p>
                                         <p className='h4 py-3'><strong>Password:</strong>{pass}</p>
-                                        <button type="button" className="btn btn-primary">Change Password</button>
+                                        <button type="button" className="btn btn-primary" onClick={() => this.props.setView({ view: CHANGEPASS })}>Change Password</button>
                                     </div>
                                 </div>
                             </div>

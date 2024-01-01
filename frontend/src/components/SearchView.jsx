@@ -201,7 +201,7 @@ class SearchView extends React.Component {
                         </div>
                         {/* Response */}
                         {this.state.status && this.state.status.success === true ? (<div className='mt-3'>{this.state.status.message}</div>) : null}
-                        {(this.state.status && this.state.status.message != "" && this.state.status.success === false) ? <p className="alert alert-danger"
+                        {(this.state.status && this.state.status.message !== "" && this.state.status.success === false) ? <p className="alert alert-danger"
                             role="alert">{this.state.status.message}</p> : null}
                         <div className="container mb-4">
                             {this.state.results.map((result, index) => (
