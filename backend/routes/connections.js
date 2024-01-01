@@ -18,7 +18,7 @@ connections.post("/search", async (req, res) => {
     if (k1 && k2 && dateTime) {
       const queryResponse = await db.searchConnections(k1, k2, dateTime);
       if (queryResponse.length === 0) {
-        res.status(200).send({
+        res.status(201).send({
           status: { success: true, message: "No connections found." },
         });
       } else {
@@ -27,7 +27,7 @@ connections.post("/search", async (req, res) => {
       }
     } else {
       res
-        .status(200)
+        .status(202)
         .send({ status: { success: false, message: "Missing fields" } });
     }
     res.end();

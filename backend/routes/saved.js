@@ -77,7 +77,7 @@ saved.post("/save_connection", async (req, res) => {
           });
         }
       } else {
-        res.status(201).send({
+        res.status(203).send({
           status: { success: false, message: "Connection allready saved." },
         });
       }
@@ -106,7 +106,7 @@ saved.post("/delete_connection", async (req, res) => {
     // Checks if both ids are present
     if (uid && rid) {
       const queryResponse = await db.deleteSaved(uid, rid);
-      if (queryResponse.success) {
+      if (queryResponse.affectedRows > 0) {
         res
           .status(200)
           .send({ status: { success: true, message: "Connection deleted" } });
@@ -121,7 +121,7 @@ saved.post("/delete_connection", async (req, res) => {
             ") not found" +
             "\x1b[0m"
         );
-        res.status(200).send({
+        res.status(201).send({
           status: { success: false, message: "Connection not found." },
         });
       }

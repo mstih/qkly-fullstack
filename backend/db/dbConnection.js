@@ -132,7 +132,8 @@ dataVar.getSaved = (id) => {
       PR.p_id,
       PR.p_ime AS izvajalec,
       PR.p_link AS link,
-      PR.p_kontakt AS kontakt
+      PR.p_kontakt AS kontakt,
+      S.s_saveDate
       FROM
           Shrani S
       JOIN
