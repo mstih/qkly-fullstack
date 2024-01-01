@@ -143,7 +143,6 @@ users.post("/changePass", async (req, res, next) => {
         res.status(201).send({
           status: { success: false, message: "Wrong password" },
         });
-        console.log("Wrong password");
       }
     } else {
       res.status(201).send({
