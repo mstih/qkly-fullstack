@@ -124,6 +124,41 @@ users.post("/register", async (req, res, next) => {
   }
 });
 
+// CHANGE PASSWORD
+// Purpose: Check for all the fields and change the password
+users.post("/changePass", async (req, res, next) => {
+  try {
+    const uId = req.body.uid;
+    const email = req.body.email;
+    const oldPass = req.body.currentPass;
+    const newPass = req.body.newPass;
+    if (uId && email && oldPass && newPass) {
+      const queryResponse = await db.changePass(uId, email, oldPass, newPass);
+      if (queryResponse.affectedRows > 0) {
+        res.status(200).send({
+          status: { success: true, message: "Password changed!" },
+        });
+        console.log("Password changed!");
+      } else {
+        res.status(201).send({
+          status: { success: false, message: "Wrong password" },
+        });
+        console.log("Wrong password");
+      }
+    } else {
+      res.status(201).send({
+        status: { success: false, message: "Please fill in all the fields" },
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .send({ status: { success: false, message: "Server error" } });
+    next();
+  }
+});
+
 // SESSION
 // Purpose: Return info about logged user
 users.get("/session", async (req, res, next) => {

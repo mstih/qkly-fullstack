@@ -55,6 +55,19 @@ dataVar.register = (name, surname, email, pass) => {
   });
 };
 
+dataVar.changePass = (uId, email, oldPass, newPass) => {
+  return new Promise((resolve, reject) => {
+    dbConnection.query(
+      "UPDATE Uporabnik SET u_geslo = CAST(? AS CHAR(60)) WHERE u_id = ? AND u_mail = ? AND u_geslo = CAST(? AS CHAR(60))",
+      [newPass, uId, email, oldPass],
+      (error, result) => {
+        if (error) return reject(error);
+        return resolve(result);
+      }
+    );
+  });
+};
+
 // TODO: Create a function that searches for all connections in the POVEZAVA table at the specific date and combination of two cities
 // TO FINISH WITH
 dataVar.searchConnections = (cityFrom, cityTo, date) => {
