@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { API_URL } from '../utils/Constants.js'
+import { API_URL, HOME, NO_CONNECTION, SIGNUP, TIMEOUT } from '../utils/Constants.js'
 
 class LoginView extends React.Component {
     constructor(props) {
@@ -48,7 +48,7 @@ class LoginView extends React.Component {
     // Function to handle the submit button
     handleSubmit = (event) => {
         event.preventDefault();
-        let request = axios.create({ timeout: 5000, withCredentials: true });
+        let request = axios.create({ timeout: TIMEOUT, withCredentials: true });
         request.post(API_URL + '/users/login', {
             email: this.state.input.email,
             pass: this.state.input.password
@@ -63,9 +63,18 @@ class LoginView extends React.Component {
                     this.setState(this.state.user = response.data.user)
                 }
                 this.props.getLoginDataFromChild(this.state);
-            }).catch(error => { console.log(error) }
+
+                setTimeout(() => this.props.setView({ view: HOME }), 1500);
+            }).catch(error => {
+                console.log(error);
+                this.setState({ status: { success: false, message: NO_CONNECTION } })
+            }
 
             );
+    }
+
+    doNotHaveAccountYet() {
+        setTimeout(() => this.props.setView({ view: SIGNUP }), 500);
     }
 
     render() {
@@ -88,10 +97,13 @@ class LoginView extends React.Component {
                                 <input type="checkbox" className="form-check-input" id="rememberMe" name="rememberMe" onChange={this.getRememberMeChoice.bind(this)} />
                                 <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
                             </div>
-                            <button type="submit" disabled={this.state.disabledButton} className="btn btn-primary rounded-pill px-4 py-2">Login</button>
+                            <button type="submit" disabled={this.state.disabledButton} className="btn btn-primary px-4 py-2">Login</button>
                         </form>
-                        {/* Response on submit click*/}
                         <div className='mt-3'>
+                            <a href="#" onClick={this.doNotHaveAccountYet.bind(this)}>Don't have an account yet? Sign up here</a>
+                        </div>
+                        {/* Response on submit click*/}
+                        <div className='my-3'>
                             {this.state.status.success ?
                                 <p className="alert alert-success"
                                     role="alert">{this.state.status.message}</p> : null}

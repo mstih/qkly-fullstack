@@ -15,6 +15,7 @@ import SearchView from "./components/SearchView.jsx";
 import LoginView from "./components/LoginView.jsx";
 import SignUpView from "./components/SignUpView.jsx";
 import SavedView from "./components/SavedView.jsx";
+import ProfileView from "./components/ProfileView.jsx";
 
 class App extends React.Component {
   constructor(props) {
@@ -41,11 +42,18 @@ class App extends React.Component {
       case SEARCH:
         return <SearchView user={this.state.user} />;
       case LOGIN:
-        return <LoginView getLoginDataFromChild={this.getLogin} />;
+        return (
+          <LoginView
+            getLoginDataFromChild={this.getLogin}
+            setView={this.setView}
+          />
+        );
       case SIGNUP:
-        return <SignUpView />;
+        return <SignUpView setView={this.setView} />;
       case SAVED:
-        return <SavedView />;
+        return <SavedView userId={this.state.user.u_id} />;
+      case PROFILE:
+        return <ProfileView userData={this.state.user} />;
       default:
         return <HomeView />;
     }

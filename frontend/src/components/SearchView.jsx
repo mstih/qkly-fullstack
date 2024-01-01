@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { API_URL } from '../utils/Constants';
+import { API_URL, NO_CONNECTION, TIMEOUT } from '../utils/Constants';
 
 class SearchView extends React.Component {
     constructor(props) {
@@ -13,23 +13,28 @@ class SearchView extends React.Component {
             buttonLocked: true,
             results: [],
             user: props.user,
+            status: {
+                success: null,
+                message: ''
+            }
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     };
 
-
+    // Get all the cities as soon as the view is loaded
     componentDidMount() {
-        axios.get(API_URL + '/kraji')
+        axios.get(API_URL + '/kraji', { timeout: TIMEOUT })
             .then(response => {
                 this.setState({ cities: response.data });
                 console.log(this.state.cities)
             })
             .catch(error => {
                 console.error('Error fetching data: ', error);
-                this.setState({ message: 'Error fetching data' });
+                this.setState({ status: { success: false, message: NO_CONNECTION } })
             });
     }
 
+    // Check to prevent clicking on search button if any of the input fields is empty
     checkButtonLock() {
         if (this.state.arrival == null || this.state.departure == null || this.state.date == null) {
             this.setState({ buttonLocked: true })
@@ -78,7 +83,11 @@ class SearchView extends React.Component {
         }
         console.log("DATA: " + JSON.stringify(data));
 
-        axios.post(API_URL + '/connections/search', data).then(response => {
+        axios.post(API_URL + '/connections/search', data, { timeout: TIMEOUT }).then(response => {
+            if (response.status !== 200) {
+                this.setState({ status: response.data.status }, () => console.log(response.data.status));
+                return;
+            }
             // First the results are sorted by departure time
             const sortedConnections = response.data.sort((a, b) => new Date(a.r_casOdhod) - new Date(b.r_casOdhod));
 
@@ -99,10 +108,11 @@ class SearchView extends React.Component {
             });
 
             // Move results to state so they can be displayed
-            this.setState({ results: withCalculations }, () => console.log(this.state.results));
+            this.setState({ results: withCalculations, status: response.data.status }, () => console.log(this.state));
             console.log(response.data)
         }).catch((error) => {
             console.log(error)
+            this.setState({ status: { success: false, message: NO_CONNECTION } })
         });
     }
 
@@ -112,31 +122,37 @@ class SearchView extends React.Component {
             url: API_URL + '/saved/download/' + id,
             method: 'GET',
             responseType: 'blob', // Important, otherwise will not work
+            timeout: TIMEOUT,
         }).then((response) => {
             // Not sure how exactly but spent 2h figuring out, thanks to some random website it works
             const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
+            const link = document.createElement('a'); // Like why? 
             link.href = url;
-            link.setAttribute('download', 'calendar.ics');
+            link.setAttribute('download', 'calendar.ics'); // Crazy way, but i think it works
             document.body.appendChild(link);
-            link.click();
+            link.click(); // Fake clicking, wtf?
         }).catch((error) => {
             console.log(error);
+            this.setState({ status: { success: false, message: NO_CONNECTION } })
         });
     }
 
+    // Save route to user's saved routes
     handleSaveRoute(r_id) {
         const data = {
             rid: r_id,
             uid: this.state.user.u_id
         }
-        axios.post(API_URL + '/saved/save_connection', data).then((response) => {
+        axios.post(API_URL + '/saved/save_connection', data, { timeout: TIMEOUT }).then((response) => {
             if (response.status === 200) {
                 alert("Saved!");
             } else {
                 alert("Not saved: " + response.data.status.message);
             }
-        }).catch((error) => { console.log(error); });
+        }).catch((error) => {
+            console.log(error);
+            this.setState({ status: { success: false, message: NO_CONNECTION } })
+        });
     }
 
     render() {
@@ -156,7 +172,7 @@ class SearchView extends React.Component {
                         </div>
                         <div className="card mb-4">
                             <div className="card-body">
-                                <form onSubmit={this.handleSearch}>
+                                <form onSubmit={this.handleSearch.bind(this)}>
                                     <div className="row align-items-end">
                                         <div className="col">
                                             <label htmlFor="departure" className="form-label">Departure</label>
@@ -177,13 +193,17 @@ class SearchView extends React.Component {
                                             <input type="date" className="form-control" id="date" name="date" min={today} onChange={this.handleDateChange.bind(this)} />
                                         </div>
                                         <div className="col text-center mt-2 mt-sm-0">
-                                            <button type="submit" className="btn btn-primary w-100">Search</button>
+                                            <button type="submit" className="btn btn-primary w-100" disabled={this.state.buttonLocked}>Search</button>
                                         </div>
                                     </div>
                                 </form>
                             </div>
                         </div>
-                        <div className="container">
+                        {/* Response */}
+                        {this.state.status && this.state.status.success === true ? (<div className='mt-3'>{this.state.status.message}</div>) : null}
+                        {(this.state.status && this.state.status.message != "" && this.state.status.success === false) ? <p className="alert alert-danger"
+                            role="alert">{this.state.status.message}</p> : null}
+                        <div className="container mb-4">
                             {this.state.results.map((result, index) => (
                                 <div className="card mb-3" key={index}>
                                     <div className="row g-0">
@@ -199,7 +219,7 @@ class SearchView extends React.Component {
                                         </div>
                                         <div className="col-md-8">
                                             <div className="card-body py-2">
-                                                <p className="card-text mb-1">Time: {result.time}</p>
+                                                <p className="card-text mb-1">Time: {result.time}h</p>
                                                 <p className="card-text mb-1">Operator: {result.izvajalec}</p>
                                                 <p className="card-text mb-1">Contact: <a href={`mailto:${result.kontakt}`}>{result.kontakt}</a></p>
                                                 <p className="card-text mb-1">Link: <a href={result.link}>{result.link}</a></p>
@@ -213,14 +233,13 @@ class SearchView extends React.Component {
                                     </div>
                                     {this.state.user !== null ? (
                                         <div className="d-flex justify-content-center mb-3">
-                                            <button className="btn btn-primary me-2" disabled={this.state.disableSave} onClick={() => this.handleSaveRoute(result.r_id)}>Save Route</button>
+                                            <button className="btn btn-primary me-2" onClick={() => this.handleSaveRoute(result.r_id)}>Save Route</button>
                                             <button className="btn btn-secondary" onClick={() => this.downloadCalendarFile(result.r_id)}>Save to Calendar</button>
                                         </div>
                                     ) : null}
                                 </div>
                             ))}
                         </div>
-
                         {/* <p></p> */}
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { API_URL } from '../utils/Constants';
+import { API_URL, LOGIN, NO_CONNECTION, TIMEOUT } from '../utils/Constants';
 
 class SignUpView extends React.Component {
     constructor(props) {
@@ -41,7 +41,7 @@ class SignUpView extends React.Component {
             surname: this.state.input.surname,
             email: this.state.input.email,
             pass: this.state.input.password
-        }).then(response => {
+        }, { timeout: TIMEOUT }).then(response => {
             if (response.status === 200) {
                 console.log(response.data)
                 this.setState(this.state.status = response.data.status);
@@ -51,7 +51,12 @@ class SignUpView extends React.Component {
             console.log("Sent registration request!")
         }).catch(error => {
             console.log(error);
+            this.setState({ status: { success: false, message: NO_CONNECTION } })
         });
+    }
+
+    allreadyHaveAccount() {
+        setTimeout(() => this.props.setView({ view: LOGIN }), 500);
     }
 
     render() {
@@ -81,6 +86,9 @@ class SignUpView extends React.Component {
                             </div>
                             <button type="submit" disabled={this.state.disabledButton} className="btn btn-primary">Sign Up</button>
                         </form>
+                        <div className='mt-3'>
+                            <a href="#" onClick={this.allreadyHaveAccount.bind(this)}>Allready have an account? Login here</a>
+                        </div>
                         {/* Response */}
                         <div className='mt-3'>
                             {this.state.status.success ?
