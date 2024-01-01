@@ -29,7 +29,7 @@ saved.get("/all/:id", async (req, res) => {
     if (id) {
       const queryResponse = await db.getSaved(id);
       // NO SAVED CONNECTIONS
-      if (queryResponse.length == 0) {
+      if (queryResponse.length === 0) {
         res.status(200).send({
           status: { success: true, message: "No saved connections found" },
         });

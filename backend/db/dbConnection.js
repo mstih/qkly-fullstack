@@ -123,13 +123,16 @@ dataVar.getConnectionData = (id) => {
 dataVar.getSaved = (id) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(
-      `SELECT 
-          S.u_id, S.r_id, 
-          P.*, 
-          K1.k_ime AS k_odhod, 
-          K2.k_ime AS k_prihod,
-          V.v_opis AS vozilo,
-          PR.p_ime, PR.p_link, PR.p_kontakt
+      `SELECT S.u_id, P.r_id, P.r_odhod, P.r_prihod, 
+      P.r_casOdhod, P.r_casPrihod, P.r_cena AS cena,
+      K1.k_ime AS k_odhod, 
+      K2.k_ime AS k_prihod,
+      V.v_id,
+      V.v_opis AS vozilo, 
+      PR.p_id,
+      PR.p_ime AS izvajalec,
+      PR.p_link AS link,
+      PR.p_kontakt AS kontakt
       FROM
           Shrani S
       JOIN
