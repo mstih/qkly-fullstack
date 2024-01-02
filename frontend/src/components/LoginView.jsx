@@ -61,15 +61,15 @@ class LoginView extends React.Component {
                     console.log(response.data)
                     this.setState(this.state.status = response.data.status);
                     this.setState(this.state.user = response.data.user)
+                    this.props.getLoginDataFromChild(this.state);
+                    setTimeout(() => this.props.setView({ view: HOME }), 1500);
+                } else {
+                    this.setState(this.state.status = response.data.status);
                 }
-                this.props.getLoginDataFromChild(this.state);
-
-                setTimeout(() => this.props.setView({ view: HOME }), 1500);
             }).catch(error => {
                 console.log(error);
                 this.setState({ status: { success: false, message: NO_CONNECTION } })
             }
-
             );
     }
 

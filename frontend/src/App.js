@@ -32,6 +32,7 @@ class App extends React.Component {
     };
     // Not sure but passing views does not work otherwise
     this.setView = this.setView.bind(this);
+    this.getLogoutFromPassChange = this.getLogoutFromPassChange.bind(this);
   }
 
   getView(state) {
@@ -60,7 +61,10 @@ class App extends React.Component {
         );
       case CHANGEPASS:
         return (
-          <ChangePassView userData={this.state.user} setView={this.setView} />
+          <ChangePassView
+            userData={this.state.user}
+            logout={this.getLogoutFromPassChange}
+          />
         );
       default:
         return <HomeView />;
@@ -81,6 +85,12 @@ class App extends React.Component {
   getLogin = (data) => {
     this.setState((this.state.user = data.user));
   };
+
+  getLogoutFromPassChange() {
+    //Logout
+    this.setState({ user: null });
+    this.setView({ view: LOGIN });
+  }
 
   render() {
     return (

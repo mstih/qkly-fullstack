@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import axios from 'axios'
 import { API_URL, NO_CONNECTION, TIMEOUT, LOGIN } from '../utils/Constants';
 
@@ -23,6 +24,7 @@ class ChangePassView extends React.Component {
     }
 
     getTextInput = (event) => {
+        event.preventDefault();
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -32,7 +34,6 @@ class ChangePassView extends React.Component {
                 [name]: value
             }
         }, () => {
-            console.log(this.state.input);
             this.checkInputForLock(); //
         })
     }
@@ -46,9 +47,12 @@ class ChangePassView extends React.Component {
         }
     }
 
-    handleSubmitButtonClick() {
-        const { cPass, nPass, nPass2 } = this.state.input;
-        if (cPass !== this.state.user.pass) {
+    handleSubmitButtonClick(event) {
+        event.preventDefault();
+        const cPass = this.state.input.currentPassword;
+        const nPass = this.state.input.newPassword;
+        const nPass2 = this.state.input.confirmNewPassword;
+        if (cPass !== this.state.user.u_geslo) {
             this.setState({ status: { success: false, message: "Your current password is not correct!" } });
             return;
         } else if (nPass !== nPass2) {
@@ -56,6 +60,7 @@ class ChangePassView extends React.Component {
             return;
         } else {
             axios.post(API_URL + "/users/changePass", {
+                uid: this.state.user.u_id,
                 email: this.state.user.u_mail,
                 currentPass: cPass,
                 newPass: nPass2
@@ -64,11 +69,13 @@ class ChangePassView extends React.Component {
                 if (response.status === 200) {
                     console.log(response.data)
                     this.setState(this.state.status = response.data.status);
+                    // LOGOUT from this session
+                    setTimeout(() => this.props.logout(), 1500);
                 } else {
                     this.setState(this.state.status = response.data.status);
                 }
                 //LOGOUT
-                setTimeout(() => this.props.setView({ view: LOGIN }), 1500);
+                //setTimeout(() => this.props.setView({ view: LOGIN }), 1500);
             }).catch((error) => {
                 console.error(error);
                 this.setState({ status: { success: false, message: NO_CONNECTION } })
@@ -83,7 +90,7 @@ class ChangePassView extends React.Component {
                 <h2>Change Your Password</h2>
                 <div className="card p-4">
                     <h5 className="card-title">{user.email}</h5>
-                    <form onSubmit={() => this.handleSubmitButtonClick}>
+                    <form onSubmit={(event) => this.handleSubmitButtonClick(event)}>
                         <div className="form-group mb-3">
                             <label htmlFor="email">User: </label>
                             <input className="form-control" type="text" id="email" value={user.u_mail} disabled />
@@ -103,7 +110,7 @@ class ChangePassView extends React.Component {
                         <button type="submit" className="btn btn-primary" disabled={this.state.buttonLocked}>Change Password</button>
                     </form>
                 </div>
-                <div className='my-3'>
+                <div className='my-3 mb-3'>
                     {this.state.status.success ?
                         <p className="alert alert-success"
                             role="alert">{this.state.status.message}</p> : null}
@@ -117,5 +124,8 @@ class ChangePassView extends React.Component {
         )
     }
 }
+ChangePassView.propTypes = {
+    logout: PropTypes.func.isRequired,
+};
 
 export default ChangePassView
