@@ -24,14 +24,17 @@ users.post("/login", async (req, res, next) => {
               " - LOGIN at:  " +
               new Date().toLocaleString()
           );
-          //req.session.user = queryResponse;
-          //req.session.loggedIN = true;
+          // Will check how this exactly works
+          req.session.user = queryResponse;
+          req.session.logged_in = true;
+          console.log(req.session);
+          console.log(req.cookies);
           res.status(200).send({
             user: queryResponse[0],
             status: { success: true, message: "Logged in" },
           });
         } else {
-          res.status(200);
+          res.status(201);
           res.send({
             user: null,
             status: { success: false, message: "Password incorrect" },
@@ -39,7 +42,7 @@ users.post("/login", async (req, res, next) => {
           console.log("Login error: Password incorrect");
         }
       } else {
-        res.status(200);
+        res.status(201);
         res.send({
           user: null,
           status: {
@@ -50,7 +53,7 @@ users.post("/login", async (req, res, next) => {
         console.log("Login error: Email " + email + " is not registered.");
       }
     } else {
-      res.status(200);
+      res.status(201);
       res.send({
         logged: false,
         user: null,
@@ -71,8 +74,9 @@ users.post("/login", async (req, res, next) => {
 // Purpose: Destroy the session and log out the user
 users.get("/logout", async (req, res, next) => {
   try {
-    // session destroy
-    // res.json({success: true, message: "Logged out"})
+    req.session.destroy();
+    res.json({ success: true, message: "Logged out" });
+    console.log("Logged out");
   } catch (error) {
     res.sendStatus(500);
   }
@@ -141,7 +145,10 @@ users.post("/changePass", async (req, res, next) => {
         console.log("Password changed!");
       } else {
         res.status(201).send({
-          status: { success: false, message: "Wrong password" },
+          status: {
+            success: false,
+            message: "Your current password is incorrect",
+          },
         });
       }
     } else {
@@ -161,7 +168,11 @@ users.post("/changePass", async (req, res, next) => {
 // SESSION
 // Purpose: Return info about logged user
 users.get("/session", async (req, res, next) => {
-  // Return session info
+  try {
+    res.json(req.session);
+  } catch (error) {
+    res.sendStatus(500);
+  }
 });
 
 module.exports = users;

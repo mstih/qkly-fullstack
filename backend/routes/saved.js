@@ -24,14 +24,19 @@ saved.get("/", (req, res) => {
 // GET ALL SAVED CONNECTIONS
 // Purpose: Show all saved connection for a specific userID
 saved.get("/all/:id", async (req, res) => {
+  console.log("Userid: " + req.params.id);
   try {
     const id = req.params.id;
-    if (id) {
+    if (id !== null && id !== undefined && id !== "") {
       const queryResponse = await db.getSaved(id);
       // NO SAVED CONNECTIONS
+      console.log(queryResponse);
       if (queryResponse.length === 0) {
-        res.status(200).send({
-          status: { success: true, message: "No saved connections found" },
+        console.log(
+          "Get Saved connections for Uid: " + id + " --> no connections"
+        );
+        res.status(201).send({
+          status: { success: false, message: "No saved connections found" },
         });
         // Return saved connections
       } else {
@@ -41,7 +46,7 @@ saved.get("/all/:id", async (req, res) => {
       // No id provided, return false
     } else {
       res
-        .status(200)
+        .status(201)
         .send({ status: { success: false, message: "No user id provided." } });
       console.log("GET SAVED CONNECTIONS(Error): No user id provided.");
     }
@@ -68,6 +73,7 @@ saved.post("/save_connection", async (req, res) => {
       if (!isAllreadySaved || isAllreadySaved.length === 0) {
         const queryResponse = await db.saveConnection(uID, rID);
         if (queryResponse) {
+          console.log("Connection saved");
           res
             .status(200)
             .send({ status: { success: true, message: "Connection saved." } });

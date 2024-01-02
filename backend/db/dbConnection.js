@@ -121,7 +121,7 @@ dataVar.getConnectionData = (id) => {
       JOIN Prevoznik PR ON V.v_izvajalec = PR.p_id
       WHERE P.r_id = ?;
     `,
-      [id],
+      id,
       (error, result) => {
         if (error) return reject(error);
         return resolve(result);
@@ -136,7 +136,7 @@ dataVar.getConnectionData = (id) => {
 dataVar.getSaved = (id) => {
   return new Promise((resolve, reject) => {
     dbConnection.query(
-      `SELECT S.u_id, P.r_id, P.r_odhod, P.r_prihod, 
+      `SELECT P.r_id, P.r_odhod, P.r_prihod, 
       P.r_casOdhod, P.r_casPrihod, P.r_cena AS cena,
       K1.k_ime AS k_odhod, 
       K2.k_ime AS k_prihod,
@@ -156,9 +156,9 @@ dataVar.getSaved = (id) => {
       JOIN
           Kraj K2 ON P.r_prihod = K2.k_id
       JOIN
-          Prevoznik PR ON P.r_id = PR.p_id
-      JOIN
           Vozilo V ON P.r_vozilo = V.v_id
+      JOIN
+          Prevoznik PR ON PR.p_id = V.v_izvajalec
       WHERE
       S.u_id = ?;`,
       id,
