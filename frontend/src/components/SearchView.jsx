@@ -7,6 +7,8 @@ class SearchView extends React.Component {
         super(props);
         this.state = {
             cities: [],
+            departureCities: [],
+            arrivalCities: [],
             departure: null,
             arrival: null,
             date: null,
@@ -18,14 +20,15 @@ class SearchView extends React.Component {
                 message: ''
             }
         };
-        this.handleInputChange = this.handleInputChange.bind(this);
+
     };
 
     // Get all the cities as soon as the view is loaded
     componentDidMount() {
         axios.get(API_URL + '/kraji', { timeout: TIMEOUT })
             .then(response => {
-                this.setState({ cities: response.data });
+                // fill all three
+                this.setState({ cities: response.data, departureCities: response.data, arrivalCities: response.data });
                 console.log(this.state.cities)
             })
             .catch(error => {
@@ -43,23 +46,44 @@ class SearchView extends React.Component {
         }
     }
 
-    handleInputChange(event) {
+    handleDepartureChange(event) {
+        event.preventDefault();
         const target = event.target;
         let value;
-        try {
-            value = JSON.parse(target.value);
-        } catch (error) {
-            console.log(error.message);
-            return
+        if (target.value) {
+            try {
+                value = JSON.parse(target.value);
+            } catch (error) {
+                console.log(error.message);
+                return
+            }
+        } else {
+            value = null;
         }
-        const name = target.name;
         this.setState({
-            [name]: value
-        }, () => {
-            console.log(this.state);
-            this.checkButtonLock();
-        });
+            departure: value,
+            arrivalCities: value ? this.state.cities.filter(city => city.k_ime !== value.k_ime) : this.state.cities
+        }, this.checkButtonLock);
+    }
 
+    handleArrivalChange(event) {
+        event.preventDefault();
+        const target = event.target;
+        let value;
+        if (target.value) {
+            try {
+                value = JSON.parse(target.value);
+            } catch (error) {
+                console.log(error.message);
+                return
+            }
+        } else {
+            value = null;
+        }
+        this.setState({
+            arrival: value,
+            departureCities: value ? this.state.cities.filter(city => city.k_ime !== value.k_ime) : this.state.cities
+        }, this.checkButtonLock);
     }
 
     handleDateChange(event) {
@@ -85,7 +109,7 @@ class SearchView extends React.Component {
 
         axios.post(API_URL + '/connections/search', data, { timeout: TIMEOUT }).then(response => {
             if (response.status !== 200) {
-                this.setState({ status: response.data.status }, () => console.log(response.data.status));
+                this.setState({ status: response.data.status, results: [] }, () => console.log(response.data.status));
                 return;
             }
             // First the results are sorted by departure time
@@ -145,9 +169,9 @@ class SearchView extends React.Component {
         }
         axios.post(API_URL + '/saved/save_connection', data, { timeout: TIMEOUT }).then((response) => {
             if (response.status === 200) {
-                alert("Saved!");
+                this.setState({ status: response.data.status });
             } else {
-                alert("Not saved: " + response.data.status.message);
+                this.setState({ status: response.data.status });
             }
         }).catch((error) => {
             console.log(error);
@@ -158,11 +182,6 @@ class SearchView extends React.Component {
     render() {
         const todayFull = new Date().toISOString();
         const today = todayFull.split('T')[0];
-
-        const { departure, arrival, cities } = this.state;
-        // To prevent the two cities be identical, filter out the ones that are already selected
-        const departureCities = cities.filter(city => city.k_ime !== (arrival && arrival.k_ime));
-        const arrivalCities = cities.filter(city => city.k_ime !== (departure && departure.k_ime));
         return (
             <div className="container mt-5">
                 <div className="row justify-content-center">
@@ -176,16 +195,16 @@ class SearchView extends React.Component {
                                     <div className="row align-items-end">
                                         <div className="col">
                                             <label htmlFor="departure" className="form-label">Departure</label>
-                                            <select className="form-control" id="departure" name="departure" onChange={this.handleInputChange.bind(this)}>
+                                            <select className="form-control" id="departure" name="departure" onChange={this.handleDepartureChange.bind(this)}>
                                                 <option value={null}></option>
-                                                {departureCities.map((city, index) => <option key={index} value={JSON.stringify(city)}>{city.k_ime}</option>)}
+                                                {this.state.departureCities.map((city, index) => <option key={index} value={JSON.stringify(city)}>{city.k_ime}</option>)}
                                             </select>
                                         </div>
                                         <div className="col">
                                             <label htmlFor="arrival" className="form-label">Arrival</label>
-                                            <select className="form-control" id="arrival" name="arrival" onChange={this.handleInputChange.bind(this)}>
+                                            <select className="form-control" id="arrival" name="arrival" onChange={this.handleArrivalChange.bind(this)}>
                                                 <option value={null}></option>
-                                                {arrivalCities.map((city, index) => <option key={index} value={JSON.stringify(city)}>{city.k_ime}</option>)}
+                                                {this.state.arrivalCities.map((city, index) => <option key={index} value={JSON.stringify(city)}>{city.k_ime}</option>)}
                                             </select>
                                         </div>
                                         <div className="col">
@@ -200,8 +219,8 @@ class SearchView extends React.Component {
                             </div>
                         </div>
                         {/* Response */}
-                        {this.state.status && this.state.status.success === true ? (<div className='mt-3'>{this.state.status.message}</div>) : null}
-                        {(this.state.status && this.state.status.message !== "" && this.state.status.success === false) ? <p className="alert alert-danger"
+                        {this.state.status && this.state.status.success === true ? (<div className='alert alert-success mt-3'>{this.state.status.message}</div>) : null}
+                        {(this.state.status && this.state.status.message !== "" && this.state.status.success === false) ? <p className="alert alert-danger mt-3"
                             role="alert">{this.state.status.message}</p> : null}
                         <div className="container mb-4">
                             {this.state.results.map((result, index) => (
@@ -221,8 +240,8 @@ class SearchView extends React.Component {
                                             <div className="card-body py-2">
                                                 <p className="card-text mb-1">Time: {result.time}h</p>
                                                 <p className="card-text mb-1">Operator: {result.izvajalec}</p>
-                                                <p className="card-text mb-1">Contact: <a href={`mailto:${result.kontakt}`}>{result.kontakt}</a></p>
-                                                <p className="card-text mb-1">Link: <a href={result.link}>{result.link}</a></p>
+                                                <p className="card-text mb-1">Contact: <a target="_blank" href={`mailto:${result.kontakt}`}>{result.kontakt}</a></p>
+                                                <p className="card-text mb-1">Link: <a target="_blank" href={result.link}>{result.link}</a></p>
                                             </div>
                                         </div>
                                         <div className="col-md-4">

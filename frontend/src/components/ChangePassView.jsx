@@ -64,7 +64,7 @@ class ChangePassView extends React.Component {
                 email: this.state.user.u_mail,
                 currentPass: cPass,
                 newPass: nPass2
-            }, { timeout: TIMEOUT }).then((response) => {
+            }, { timeout: TIMEOUT, withCredentials: true }).then((response) => {
                 console.log("Password change request sent!");
                 if (response.status === 200) {
                     console.log(response.data)
@@ -74,8 +74,6 @@ class ChangePassView extends React.Component {
                 } else {
                     this.setState(this.state.status = response.data.status);
                 }
-                //LOGOUT
-                //setTimeout(() => this.props.setView({ view: LOGIN }), 1500);
             }).catch((error) => {
                 console.error(error);
                 this.setState({ status: { success: false, message: NO_CONNECTION } })

@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { API_URL, NO_CONNECTION, TIMEOUT } from '../utils/Constants';
 
+
 class SavedView extends React.Component {
     constructor(props) {
         super(props);
@@ -24,9 +25,18 @@ class SavedView extends React.Component {
         if (this.state.userId == null) {
             return;
         }
-        axios.get(API_URL + '/saved/all/' + this.state.userId, { timeout: TIMEOUT }).then((response) => {
+        axios.get(API_URL + '/saved/all/' + this.state.userId, { timeout: TIMEOUT, withCredentials: true }).then((response) => {
+            // If the response code is 201 --> something is not right
+            if (response.status === 201) {
+                console.log("RESPONSE STATUS WAS 201")
+                // Set state
+                this.setState(this.state.status = response.data.status)
+                this.setState({ savedRoutes: [] });
+                return;
+            }
             const now = new Date();
             now.setHours(0, 0, 0, 0);
+            console.log(response.data)
             // Filter out the old saved routes
             const noOlderConnections = response.data.filter(connection => new Date(connection.r_casOdhod) >= now);
 
@@ -38,8 +48,8 @@ class SavedView extends React.Component {
                 const arrTime = new Date(connection.r_casPrihod);
                 const diff = arrTime - depTime;
 
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const hours = String(Math.floor(diff / (1000 * 60 * 60)));
+                const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
                 const time = `${hours}:${minutes}`
 
                 const date = new Date(connection.r_casOdhod);
@@ -66,8 +76,7 @@ class SavedView extends React.Component {
     // Delete a saved route
     async deleteSavedRoute(rid) {
         try {
-            const response = await axios.post(API_URL + '/saved/delete_connection', { rid: rid, uid: this.state.userId }, { timeout: TIMEOUT });
-
+            const response = await axios.post(API_URL + '/saved/delete_connection', { rid: rid, uid: this.state.userId }, { timeout: TIMEOUT, withCredentials: true });
             if (response.status === 200) {
                 // Wait for 500 milliseconds before refreshing the saved routes
                 setTimeout(() => {
@@ -89,7 +98,8 @@ class SavedView extends React.Component {
             url: API_URL + '/saved/download/' + id,
             method: 'GET',
             responseType: 'blob', // Important, otherwise will not work
-            timeout: TIMEOUT
+            timeout: TIMEOUT,
+            withCredentials: true,
         }).then((response) => {
             // Not sure how exactly but spent 2h figuring out, thanks to some random website it works
             const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -109,8 +119,8 @@ class SavedView extends React.Component {
         return (
             <div className='container'>
                 {/* Response */}
-                {(this.state.status.success == false && this.state.status.message != "") ? <p className='alert alert-danger mt-3' role='alert'>{this.state.status.message}</p> : null}
-                <div className="mt-4">
+                {(this.state.status.success === false && this.state.status.message !== "") ? <p className='alert alert-danger mt-3' role='alert'>{this.state.status.message}</p> : null}
+                <div className="my-5">
                     {this.state.savedRoutes.map((route, index) => (
                         <div className="card mb-3" key={index}>
                             <div className="row g-0">

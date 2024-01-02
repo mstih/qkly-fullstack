@@ -8,7 +8,11 @@ import {
   PROFILE,
   SAVED,
   CHANGEPASS,
+  API_URL,
+  TIMEOUT,
+  NO_CONNECTION,
 } from "./utils/Constants.js";
+import axios from "axios";
 import Footer from "./components/Footer.jsx";
 import HomeView from "./components/HomeView.jsx";
 import AboutView from "./components/AboutView.jsx";
@@ -18,6 +22,8 @@ import SignUpView from "./components/SignUpView.jsx";
 import SavedView from "./components/SavedView.jsx";
 import ProfileView from "./components/ProfileView.jsx";
 import ChangePassView from "./components/ChangePassView.jsx";
+import Cookies from "universal-cookie";
+const cookies = new Cookies();
 
 class App extends React.Component {
   constructor(props) {
@@ -33,6 +39,37 @@ class App extends React.Component {
     // Not sure but passing views does not work otherwise
     this.setView = this.setView.bind(this);
     this.getLogoutFromPassChange = this.getLogoutFromPassChange.bind(this);
+    if (cookies.get("email") != null && this.state.user == null) {
+      let email = cookies.get("email");
+      email = email.replace("%40", "@");
+      const pass = cookies.get("pass");
+      axios
+        .post(
+          API_URL + "/users/login",
+          {
+            email: email,
+            pass: pass,
+          },
+          { timeout: TIMEOUT, withCredentials: true }
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            console.log(response.data);
+            this.setState({
+              status: response.data.status,
+              user: response.data.user,
+            });
+          } else {
+            this.setState((this.state.status = response.data.status));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setState({
+            status: { success: false, message: "Please login." },
+          });
+        });
+    }
   }
 
   getView(state) {
@@ -87,10 +124,37 @@ class App extends React.Component {
   };
 
   getLogoutFromPassChange() {
+    cookies.remove("email", { path: "/" });
+    cookies.remove("pass", { path: "/" });
     //Logout
     this.setState({ user: null });
     this.setView({ view: LOGIN });
   }
+
+  handleLogout = () => {
+    axios
+      .get(
+        API_URL + "/users/logout",
+        {},
+        { withCredentials: true, timeout: TIMEOUT }
+      )
+      .then((response) => {
+        if (response.status == 200) {
+          console.log(response.data);
+          this.setState((this.state.status = response.data));
+          this.setState({ user: null });
+          cookies.remove("email", { path: "/" });
+          cookies.remove("pass", { path: "/" });
+          setTimeout(() => this.setView({ view: HOME }), 1500);
+        } else {
+          console.log(NO_CONNECTION);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({ status: { success: false, message: NO_CONNECTION } });
+      });
+  };
 
   render() {
     return (
@@ -192,6 +256,7 @@ class App extends React.Component {
                     <li className="nav-item mx-0">
                       <a
                         // ONCLICK LOGOUT AND GO TO HOME PAGE
+                        onClick={() => this.handleLogout()}
                         className="btn bg-white rounded-pill px-3"
                         href="#"
                       >
@@ -217,13 +282,13 @@ class App extends React.Component {
         </div>
         <div id="view" className="w-100">
           {this.getView(this.state.currentView)}
-          {this.state.status.success ? (
+          {/* {this.state.status.success ? (
             <div className="d-flex justify-content-center">
               <p className="alert alert-success w-50 mt-2">
                 {this.state.status.message}
               </p>
             </div>
-          ) : null}
+          ) : null} */}
         </div>
         <Footer />
       </div>

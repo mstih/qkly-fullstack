@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { API_URL, HOME, NO_CONNECTION, SIGNUP, TIMEOUT } from '../utils/Constants.js'
+import Cookies from 'universal-cookie';
+var cookies = new Cookies();
 
 class LoginView extends React.Component {
     constructor(props) {
@@ -20,6 +22,45 @@ class LoginView extends React.Component {
             user: null,
             disabledButton: true
         }
+        if (cookies.get('email') != null && this.state.user == null) {
+            let mail = cookies.get('email');
+            mail = mail.replace('%40', '@')
+            let password = cookies.get('pass');
+            this.state.input.email = mail;
+            this.state.input.password = password;
+            this.autoLogin();
+        }
+
+    }
+    // componentDidMount() {
+    //     if (cookies.get('email') != null && this.state.user == null) {
+    //         let mail = cookies.get('email');
+    //         mail = mail.replace('%40', '@')
+    //         let password = cookies.get('pass');
+    //         this.setState({ input: { email: mail, password: password } }, () => {
+    //             this.autoLogin();
+    //         });
+    //     }
+    // }
+
+    autoLogin = () => {
+        axios.post(API_URL + '/users/login', {
+            email: this.state.input.email,
+            pass: this.state.input.password
+        }, { timeout: TIMEOUT, withCredentials: true }).then((response) => {
+            if (response.status === 200) {
+                this.setState({ status: response.data.status, user: response.data.user }, () => {
+                    this.props.getLoginDataFromChild(this.state);
+                    this.props.setView({ view: HOME });
+                });
+
+            } else {
+                this.setState(this.state.status = response.data.status);
+            }
+        }).catch((error) => {
+            console.log(error);
+            this.setState({ status: { success: false, message: "Please login." } })
+        });
     }
 
     // Function to handle entering the data in text fields and then updating the state
@@ -48,6 +89,7 @@ class LoginView extends React.Component {
     // Function to handle the submit button
     handleSubmit = (event) => {
         event.preventDefault();
+        console.log("SENDING LOGIN")
         let request = axios.create({ timeout: TIMEOUT, withCredentials: true });
         request.post(API_URL + '/users/login', {
             email: this.state.input.email,
@@ -58,11 +100,19 @@ class LoginView extends React.Component {
                 console.log(this.state.user_input)
                 console.log(response.status)
                 if (response.status === 200) {
-                    console.log(response.data)
-                    this.setState(this.state.status = response.data.status);
-                    this.setState(this.state.user = response.data.user)
-                    this.props.getLoginDataFromChild(this.state);
-                    setTimeout(() => this.props.setView({ view: HOME }), 1500);
+                    this.setState({ status: response.data.status, user: response.data.user }, () => {
+                        if (this.state.status.success) {
+                            if (this.state.input.rememberMe) {
+                                let email = this.state.user.u_mail;
+                                let pass = this.state.user.u_geslo;
+                                cookies.set('email', email, { path: '/', expires: new Date(Date.now() + 86400000) })
+                                cookies.set('pass', pass, { path: '/', expires: new Date(Date.now() + 86400000) })
+                            }
+                        }
+                        this.props.getLoginDataFromChild(this.state);
+                        setTimeout(() => this.props.setView({ view: HOME }), 500);
+                    });
+
                 } else {
                     this.setState(this.state.status = response.data.status);
                 }
