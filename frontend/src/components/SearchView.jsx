@@ -179,6 +179,23 @@ class SearchView extends React.Component {
         });
     }
 
+    handleSwitch() {
+        //Checks if one of them is empty
+        if (this.state.departure == null || this.state.arrival == null) return;
+        //Saves the current values
+        const currentArrival = this.state.arrival;
+        const currentDeparture = this.state.departure;
+        //Switches the values and filters cities again
+        this.setState({
+            departure: currentArrival,
+            arrival: currentDeparture,
+            departureCities: this.state.cities.filter(c => c.k_ime !== currentDeparture.k_ime),
+            arrivalCities: this.state.cities.filter(c => c.k_ime !== currentArrival.k_ime)
+        });
+
+
+    }
+
     render() {
         const todayFull = new Date().toISOString();
         const today = todayFull.split('T')[0];
@@ -195,16 +212,19 @@ class SearchView extends React.Component {
                                     <div className="row align-items-end">
                                         <div className="col">
                                             <label htmlFor="departure" className="form-label">Departure</label>
-                                            <select className="form-control" id="departure" name="departure" onChange={this.handleDepartureChange.bind(this)}>
+                                            <select className="form-control" id="departure" name="departure" value={JSON.stringify(this.state.departure)} onChange={this.handleDepartureChange.bind(this)}>
                                                 <option value={null}></option>
-                                                {this.state.departureCities.map((city, index) => <option key={index} value={JSON.stringify(city)}>{city.k_ime}</option>)}
+                                                {this.state.departureCities.map((c, i) => <option key={i} value={JSON.stringify(c)}>{c.k_ime}</option>)}
                                             </select>
+                                        </div>
+                                        <div className=" col-auto">
+                                            <img src="/assets/images/switch.png" alt="Switch" className="cursor-pointer" style={{ width: "40px" }} onClick={this.handleSwitch.bind(this)} />
                                         </div>
                                         <div className="col">
                                             <label htmlFor="arrival" className="form-label">Arrival</label>
-                                            <select className="form-control" id="arrival" name="arrival" onChange={this.handleArrivalChange.bind(this)}>
+                                            <select className="form-control" id="arrival" name="arrival" value={JSON.stringify(this.state.arrival)} onChange={this.handleArrivalChange.bind(this)}>
                                                 <option value={null}></option>
-                                                {this.state.arrivalCities.map((city, index) => <option key={index} value={JSON.stringify(city)}>{city.k_ime}</option>)}
+                                                {this.state.arrivalCities.map((c, i) => <option key={i} value={JSON.stringify(c)}>{c.k_ime}</option>)}
                                             </select>
                                         </div>
                                         <div className="col">
@@ -222,9 +242,9 @@ class SearchView extends React.Component {
                         {this.state.status && this.state.status.success === true ? (<div className='alert alert-success mt-3'>{this.state.status.message}</div>) : null}
                         {(this.state.status && this.state.status.message !== "" && this.state.status.success === false) ? <p className="alert alert-danger mt-3"
                             role="alert">{this.state.status.message}</p> : null}
-                        <div className="container mb-4">
+                        <div className="container mb-3">
                             {this.state.results.map((result, index) => (
-                                <div className="card mb-3" key={index}>
+                                <div className="card mb-3 " key={index}>
                                     <div className="row g-0">
                                         <div className="col-12">
                                             <div className="card-body pt-3 pb-2">
@@ -239,14 +259,15 @@ class SearchView extends React.Component {
                                         <div className="col-md-8">
                                             <div className="card-body py-2">
                                                 <p className="card-text mb-1">Time: {result.time}h</p>
-                                                <p className="card-text mb-1">Operator: {result.izvajalec}</p>
-                                                <p className="card-text mb-1">Contact: <a target="_blank" href={`mailto:${result.kontakt}`}>{result.kontakt}</a></p>
-                                                <p className="card-text mb-1">Link: <a target="_blank" href={result.link}>{result.link}</a></p>
+                                                <p className="card-text mb-1">Type: {result.vozilo}</p>
+
                                             </div>
                                         </div>
                                         <div className="col-md-4">
                                             <div className="card-body py-2">
-                                                <p className="card-text mb-0">Type: {result.vozilo}</p>
+                                                <p className="card-text mb-1">Operator: {result.izvajalec}</p>
+                                                <p className="card-text mb-1">Contact: <a target="_blank" href={`mailto:${result.kontakt}`}>{result.kontakt}</a></p>
+                                                <p className="card-text mb-1">Link: <a target="_blank" href={result.link}>{result.link}</a></p>
                                             </div>
                                         </div>
                                     </div>

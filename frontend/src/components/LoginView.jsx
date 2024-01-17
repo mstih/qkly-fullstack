@@ -32,16 +32,6 @@ class LoginView extends React.Component {
         }
 
     }
-    // componentDidMount() {
-    //     if (cookies.get('email') != null && this.state.user == null) {
-    //         let mail = cookies.get('email');
-    //         mail = mail.replace('%40', '@')
-    //         let password = cookies.get('pass');
-    //         this.setState({ input: { email: mail, password: password } }, () => {
-    //             this.autoLogin();
-    //         });
-    //     }
-    // }
 
     autoLogin = () => {
         axios.post(API_URL + '/users/login', {
@@ -73,7 +63,6 @@ class LoginView extends React.Component {
     getRememberMeChoice(e) {
         this.state.input.rememberMe = !this.state.input.rememberMe;
         this.setState({ input: this.state.input });
-        console.log(this.state.input.rememberMe)
     }
 
     // Each time you user enters something it checks for the input and if both fields are not empty it unlocks the button 
@@ -89,16 +78,13 @@ class LoginView extends React.Component {
     // Function to handle the submit button
     handleSubmit = (event) => {
         event.preventDefault();
-        console.log("SENDING LOGIN")
         let request = axios.create({ timeout: TIMEOUT, withCredentials: true });
         request.post(API_URL + '/users/login', {
             email: this.state.input.email,
             pass: this.state.input.password
         })
             .then((response) => {
-                console.log("Login request sent!")
                 console.log(this.state.user_input)
-                console.log(response.status)
                 if (response.status === 200) {
                     this.setState({ status: response.data.status, user: response.data.user }, () => {
                         if (this.state.status.success) {
