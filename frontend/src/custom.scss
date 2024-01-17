@@ -1,0 +1,29 @@
+$primary: #14cc60;
+$second: #3b3b3b;
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import "~bootstrap/scss/bootstrap";
+
+body{
+    font-family: 'Lato', sans-serif;
+}
+
+.bg-second{
+    background-color: $second !important;
+}
+
+.logo-image{
+    height: 45px;
+}
+
+.navbar-border{
+    border-bottom: 4px solid $primary;
+}
+
+.greenBorderSmall{
+    border-bottom: 2px solid $primary;
+}
+
+.blackBorderSmall{
+    border-bottom: 2px solid $second
+}
