@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import axios from 'axios'
-import { API_URL, NO_CONNECTION, TIMEOUT, LOGIN } from '../utils/Constants';
+import { API_URL, NO_CONNECTION, TIMEOUT } from '../utils/Constants';
 
 class ChangePassView extends React.Component {
     constructor(props) {
@@ -67,12 +67,11 @@ class ChangePassView extends React.Component {
             }, { timeout: TIMEOUT, withCredentials: true }).then((response) => {
                 console.log("Password change request sent!");
                 if (response.status === 200) {
-                    console.log(response.data)
-                    this.setState(this.state.status = response.data.status);
-                    // LOGOUT from this session
+                    this.setState({ status: response.data.status });
+                    // LOGOUT from this session with a small delay
                     setTimeout(() => this.props.logout(), 1500);
                 } else {
-                    this.setState(this.state.status = response.data.status);
+                    this.setState({ status: response.data.status });
                 }
             }).catch((error) => {
                 console.error(error);

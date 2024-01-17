@@ -21,16 +21,16 @@ const AboutView = () => {
                 <div className='col-12 col-md-8 mb-4'>
                     <h2 className='blackBorderSmall pb-2'>How to Use Qkly</h2>
                     <p className='lead'>
-                        1. Enter your starting city and destination in the search bar.
+                        1. Enter your starting city, destination and date in the search bar.
                     </p>
                     <p className='lead'>
                         2. Browse through the list of available public transport connections.
                     </p>
                     <p className='lead'>
-                        3. Select a route to view more details.
+                        3. Select a route that suits your needs.
                     </p>
                     <p className='lead'>
-                        4. Sign up or log in to save your preferred routes and download an ICS file for your calendar.
+                        4. Sign up or log in to also save your preferred routes and download an ICS file for your calendar.
                     </p>
                 </div>
             </div>

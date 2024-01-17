@@ -39,7 +39,12 @@ class App extends React.Component {
     // Not sure but passing views does not work otherwise
     this.setView = this.setView.bind(this);
     this.getLogoutFromPassChange = this.getLogoutFromPassChange.bind(this);
-    if (cookies.get("email") != null && this.state.user == null) {
+  }
+
+  // Checks if cookies exist and makes login for user
+  componentDidMount() {
+    if (cookies.get("email") != null && this.state.user === null) {
+      console.log("Cookies found");
       let email = cookies.get("email");
       email = email.replace("%40", "@");
       const pass = cookies.get("pass");
@@ -54,13 +59,12 @@ class App extends React.Component {
         )
         .then((response) => {
           if (response.status === 200) {
-            console.log(response.data);
             this.setState({
-              status: response.data.status,
               user: response.data.user,
+              status: response.data.status,
             });
           } else {
-            this.setState((this.state.status = response.data.status));
+            this.setState({ status: response.data.status });
           }
         })
         .catch((error) => {
@@ -120,7 +124,7 @@ class App extends React.Component {
 
   // Allows the data to be passed from the login component to the app component
   getLogin = (data) => {
-    this.setState((this.state.user = data.user));
+    this.setState({ user: data.user });
   };
 
   getLogoutFromPassChange() {
@@ -139,9 +143,8 @@ class App extends React.Component {
         { withCredentials: true, timeout: TIMEOUT }
       )
       .then((response) => {
-        if (response.status == 200) {
-          console.log(response.data);
-          this.setState((this.state.status = response.data));
+        if (response.status === 200) {
+          this.setState({ status: response.data.status });
           this.setState({ user: null });
           cookies.remove("email", { path: "/" });
           cookies.remove("pass", { path: "/" });
@@ -217,7 +220,7 @@ class App extends React.Component {
                       Search
                     </a>
                   </li>
-                  {this.state.user != null ? (
+                  {this.state.user !== null ? (
                     <li className="nav-item mb-3 mb-lg-0">
                       <a
                         onClick={this.setView.bind(this, { view: SAVED })}
