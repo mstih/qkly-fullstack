@@ -28,8 +28,7 @@ class SearchView extends React.Component {
         axios.get(API_URL + '/kraji', { timeout: TIMEOUT })
             .then(response => {
                 // fill all three
-                this.setState({ cities: response.data, departureCities: response.data, arrivalCities: response.data });
-                console.log(this.state.cities)
+                this.setState({ cities: response.data, departureCities: response.data, arrivalCities: response.data }, () => console.log(this.state.cities));;
             })
             .catch(error => {
                 console.error('Error fetching data: ', error);
@@ -91,7 +90,6 @@ class SearchView extends React.Component {
         this.setState({
             date: value
         }, () => {
-            console.log(this.state);
             this.checkButtonLock();
         });
     }
@@ -105,11 +103,11 @@ class SearchView extends React.Component {
             k2: arrival.k_id,
             date: date
         }
-        console.log("DATA: " + JSON.stringify(data));
+
 
         axios.post(API_URL + '/connections/search', data, { timeout: TIMEOUT }).then(response => {
             if (response.status !== 200) {
-                this.setState({ status: response.data.status, results: [] }, () => console.log(response.data.status));
+                this.setState({ status: response.data.status, results: [] });
                 return;
             }
             // First the results are sorted by departure time
@@ -132,8 +130,7 @@ class SearchView extends React.Component {
             });
 
             // Move results to state so they can be displayed
-            this.setState({ results: withCalculations, status: response.data.status }, () => console.log(this.state));
-            console.log(response.data)
+            this.setState({ results: withCalculations, status: response.data.status });
         }).catch((error) => {
             console.log(error)
             this.setState({ status: { success: false, message: NO_CONNECTION } })
@@ -250,7 +247,7 @@ class SearchView extends React.Component {
                                             <div className="card-body pt-3 pb-2">
                                                 <h5 className="card-title fs-4 m-0">
                                                     {String(new Date(result.r_casOdhod).getHours()).padStart(2, '0')}:
-                                                    {String(new Date(result.r_casOdhod).getMinutes()).padStart(2, '0')} -
+                                                    {String(new Date(result.r_casOdhod).getMinutes()).padStart(2, '0')} {" - "}
                                                     {String(new Date(result.r_casPrihod).getHours()).padStart(2, '0')}:
                                                     {String(new Date(result.r_casPrihod).getMinutes()).padStart(2, '0')}
                                                 </h5>
