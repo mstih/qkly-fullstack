@@ -30,7 +30,6 @@ saved.get("/all/:id", async (req, res) => {
     if (id !== null && id !== undefined && id !== "") {
       const queryResponse = await db.getSaved(id);
       // NO SAVED CONNECTIONS
-      console.log(queryResponse);
       if (queryResponse.length === 0) {
         console.log(
           "Get Saved connections for Uid: " + id + " --> no connections"
@@ -155,7 +154,7 @@ saved.get("/download/:id", async (req, res) => {
       const queryResponse = await db.getConnectionData(id);
       if (queryResponse.length === 1) {
         const data = queryResponse[0];
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify(data));
         // Creates a new event and adds the data into the event object
         const event = new ical.Event();
         event.uid = "event-" + Date.now();

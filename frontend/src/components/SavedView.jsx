@@ -28,9 +28,8 @@ class SavedView extends React.Component {
         axios.get(API_URL + '/saved/all/' + this.state.userId, { timeout: TIMEOUT, withCredentials: true }).then((response) => {
             // If the response code is 201 --> something is not right
             if (response.status === 201) {
-                console.log("RESPONSE STATUS WAS 201")
-                // Set state
-                this.setState(this.state.status = response.data.status)
+                this.setState({ status: response.data.status })
+                //this.setState(this.state.status = response.data.status)
                 this.setState({ savedRoutes: [] });
                 return;
             }
@@ -128,30 +127,33 @@ class SavedView extends React.Component {
                                     <div className="card-body pt-3 pb-2">
                                         <h5 className="card-title fs-4 m-0">
                                             {route.date + ": "}
-                                            {String(new Date(route.r_casOdhod).getHours()).padStart(2, '0')}:
-                                            {String(new Date(route.r_casOdhod).getMinutes()).padStart(2, '0')} -
-                                            {String(new Date(route.r_casPrihod).getHours()).padStart(2, '0')}:
-                                            {String(new Date(route.r_casPrihod).getMinutes()).padStart(2, '0')}
+                                            <strong>
+                                                {String(new Date(route.r_casOdhod).getHours()).padStart(2, '0')}:
+                                                {String(new Date(route.r_casOdhod).getMinutes()).padStart(2, '0')} -
+                                                {String(new Date(route.r_casPrihod).getHours()).padStart(2, '0')}:
+                                                {String(new Date(route.r_casPrihod).getMinutes()).padStart(2, '0')}
+                                            </strong>
                                         </h5>
                                     </div>
                                 </div>
                                 <div className="col-md-8">
                                     <div className="card-body py-2">
                                         <p className="card-text mb-1">Time: {route.time}h</p>
+                                        <p className="card-text mb-1">Type: {route.vozilo}</p>
+
+                                    </div>
+                                </div>
+                                <div className="col-md-4">
+                                    <div className="card-body py-2">
                                         <p className="card-text mb-1">Operator: {route.izvajalec}</p>
                                         <p className="card-text mb-1">Contact: <a href={`mailto:${route.kontakt}`}>{route.kontakt}</a></p>
                                         <p className="card-text mb-1">Link: <a href={route.link}>{route.link}</a></p>
                                     </div>
                                 </div>
-                                <div className="col-md-4">
-                                    <div className="card-body py-2">
-                                        <p className="card-text mb-0">Type: {route.vozilo}</p>
-                                    </div>
-                                </div>
                             </div>
                             <div className="d-flex justify-content-center mb-3">
-                                <button className="btn btn-danger me-2" onClick={() => this.deleteSavedRoute(route.r_id)}>Delete from Saved</button>
-                                <button className="btn btn-secondary" onClick={() => this.downloadCalendarFile(route.r_id)}>Save to Calendar</button>
+                                <button className="btn btn-danger me-2 shadow" onClick={() => this.deleteSavedRoute(route.r_id)}>Delete from Saved</button>
+                                <button className="btn btn-secondary shadow" onClick={() => this.downloadCalendarFile(route.r_id)}>Save to Calendar</button>
                             </div>
                         </div>
                     ))}

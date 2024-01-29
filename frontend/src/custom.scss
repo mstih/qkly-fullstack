@@ -16,6 +16,10 @@ body{
     height: 45px;
 }
 
+.main-image{
+    height: 100px;
+}
+
 .navbar-border{
     border-bottom: 4px solid $primary;
 }
@@ -26,4 +30,19 @@ body{
 
 .blackBorderSmall{
     border-bottom: 2px solid $second
+}
+
+@keyframes homeAnimation {
+    0%{
+        opacity: 0;
+        transform: scale(0.88);
+    }
+    100%{
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.homeAnimation{
+    animation: homeAnimation 1s ease-out;
 }

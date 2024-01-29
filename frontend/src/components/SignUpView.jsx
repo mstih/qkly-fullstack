@@ -44,9 +44,10 @@ class SignUpView extends React.Component {
         }, { timeout: TIMEOUT }).then(response => {
             if (response.status === 200) {
                 console.log(response.data)
-                this.setState(this.state.status = response.data.status);
+                this.setState({ status: response.data.status });
+                setTimeout(() => this.props.setView({ view: LOGIN }), 750)
             } else {
-                this.setState(this.state.status = response.data.status);
+                this.setState({ status: response.data.status });
             }
             console.log("Sent registration request!")
         }).catch(error => {

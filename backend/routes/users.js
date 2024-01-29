@@ -15,7 +15,6 @@ users.post("/login", async (req, res, next) => {
     const pass = req.body.pass;
     if (email && pass) {
       const queryResponse = await db.userExists(email);
-      console.log(queryResponse);
       if (queryResponse.length > 0) {
         if (pass === queryResponse[0].u_geslo) {
           console.log(
@@ -27,8 +26,8 @@ users.post("/login", async (req, res, next) => {
           // Will check how this exactly works
           req.session.user = queryResponse;
           req.session.logged_in = true;
-          console.log(req.session);
-          console.log(req.cookies);
+          //console.log(req.session);
+          //console.log(req.cookies);
           res.status(200).send({
             user: queryResponse[0],
             status: { success: true, message: "Logged in" },
@@ -76,7 +75,6 @@ users.get("/logout", async (req, res, next) => {
   try {
     req.session.destroy();
     res.json({ success: true, message: "Logged out" });
-    console.log("Logged out");
   } catch (error) {
     res.sendStatus(500);
   }
@@ -93,7 +91,9 @@ users.post("/register", async (req, res, next) => {
     // Check if all the fields are not empty
     if (name && surname && email && pass) {
       // Check if the email is already registered
-      if (await db.userExists(email)) {
+      const r = await db.userExists(email);
+
+      if (r.affectedRows == 1) {
         console.log("Register error: Email already registered");
         res.status(200).send({
           status: {
