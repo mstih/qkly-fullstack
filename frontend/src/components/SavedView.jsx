@@ -121,29 +121,34 @@ class SavedView extends React.Component {
                 {(this.state.status.success === false && this.state.status.message !== "") ? <p className='alert alert-danger mt-3' role='alert'>{this.state.status.message}</p> : null}
                 <div className="my-5">
                     {this.state.savedRoutes.map((route, index) => (
-                        <div className="card mb-3" key={index}>
+                        <div className="card mb-3 shadow-sm" key={index}>
                             <div className="row g-0">
                                 <div className="col-12">
                                     <div className="card-body pt-3 pb-2">
-                                        <h5 className="card-title fs-4 m-0">
-                                            {route.date + ": "}
-                                            <strong>
-                                                {String(new Date(route.r_casOdhod).getHours()).padStart(2, '0')}:
-                                                {String(new Date(route.r_casOdhod).getMinutes()).padStart(2, '0')} -
-                                                {String(new Date(route.r_casPrihod).getHours()).padStart(2, '0')}:
-                                                {String(new Date(route.r_casPrihod).getMinutes()).padStart(2, '0')}
-                                            </strong>
-                                        </h5>
+                                        <div className="d-flex flex-column flex-md-row justify-content-md-between pb-2 border-bottom">
+                                            <h5 className="card-title fs-4 m-0">
+                                                {route.k_odhod} - {route.k_prihod}
+                                            </h5>
+                                            <h5 className="card-title fs-4 m-0">
+                                                {route.date + ": "}
+                                                <strong>
+                                                    {String(new Date(route.r_casOdhod).getHours()).padStart(2, '0')}:
+                                                    {String(new Date(route.r_casOdhod).getMinutes()).padStart(2, '0')} {" - "}
+                                                    {String(new Date(route.r_casPrihod).getHours()).padStart(2, '0')}:
+                                                    {String(new Date(route.r_casPrihod).getMinutes()).padStart(2, '0')}
+                                                </strong>
+                                            </h5>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col-md-8">
+                                <div className="col-md-6">
                                     <div className="card-body py-2">
                                         <p className="card-text mb-1">Time: {route.time}h</p>
                                         <p className="card-text mb-1">Type: {route.vozilo}</p>
 
                                     </div>
                                 </div>
-                                <div className="col-md-4">
+                                <div className="col-md-6">
                                     <div className="card-body py-2">
                                         <p className="card-text mb-1">Operator: {route.izvajalec}</p>
                                         <p className="card-text mb-1">Contact: <a href={`mailto:${route.kontakt}`}>{route.kontakt}</a></p>
@@ -151,7 +156,7 @@ class SavedView extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="d-flex justify-content-center mb-3">
+                            <div className="d-flex justify-content-center mb-3 mt-3">
                                 <button className="btn btn-danger me-2 shadow" onClick={() => this.deleteSavedRoute(route.r_id)}>Delete from Saved</button>
                                 <button className="btn btn-secondary shadow" onClick={() => this.downloadCalendarFile(route.r_id)}>Save to Calendar</button>
                             </div>
