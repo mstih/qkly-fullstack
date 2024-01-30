@@ -45,7 +45,11 @@ app.use(
   cors({
     methods: ["GET", "POST"],
     credentials: true,
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://88.200.63.148:8144",
+    ],
   })
 );
 
@@ -57,10 +61,12 @@ app.use("/kraji", kraji);
 
 // TODO: Static express files for frontend
 
-// For now a simple response to / route
+const path = require("path");
+app.use(express.static(path.join(__dirname, "build")));
 app.get("/", (req, res) => {
-  res.send("Hello, here will be the frontend.");
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
+
 // Server starting and listening
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}...`);
