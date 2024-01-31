@@ -37,10 +37,7 @@ class SavedView extends React.Component {
             now.setHours(0, 0, 0, 0);
             console.log(response.data)
             // Filter out the old saved routes
-            const noOlderConnections = response.data.filter(connection => new Date(connection.r_casOdhod) >= now);
-
-            // Sort them by their save date
-            const sorted = noOlderConnections.sort((a, b) => new Date(a.s_saveDate) - new Date(b.s_saveDate));
+            const sorted = response.data.filter(connection => new Date(connection.r_casOdhod) >= now);
 
             const withCalculations = sorted.map(connection => {
                 const depTime = new Date(connection.r_casOdhod);
@@ -121,7 +118,7 @@ class SavedView extends React.Component {
                 {(this.state.status.success === false && this.state.status.message !== "") ? <p className='alert alert-danger mt-3' role='alert'>{this.state.status.message}</p> : null}
                 <div className="my-5">
                     {this.state.savedRoutes.map((route, index) => (
-                        <div className="card mb-3 shadow-sm p-2" key={index}>
+                        <div className="card mb-3 shadow-sm p-2 " key={index}>
                             <div className="row g-0">
                                 <div className="col-12">
                                     <div className="card-body pt-3 pb-2">
