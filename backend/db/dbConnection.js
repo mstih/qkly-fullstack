@@ -92,7 +92,8 @@ dataVar.searchConnections = (cityFrom, cityTo, date) => {
       JOIN Kraj K2 ON K2.k_id = P.r_prihod
       JOIN Vozilo V ON V.v_id = P.r_vozilo
       JOIN Prevoznik PR ON PR.p_id = V.v_izvajalec
-      WHERE P.r_casOdhod LIKE ? AND P.r_odhod = ? AND P.r_prihod = ?`,
+      WHERE P.r_casOdhod LIKE ? AND P.r_odhod = ? AND P.r_prihod = ?
+      ORDER BY P.r_casOdhod ASC, P.r_casPrihod ASC;`,
       [date, cityFrom, cityTo],
       (error, result) => {
         if (error) return reject(error);
@@ -163,7 +164,8 @@ dataVar.getSaved = (id) => {
       JOIN
           Prevoznik PR ON PR.p_id = V.v_izvajalec
       WHERE
-      S.u_id = ?;`,
+      S.u_id = ?
+      ORDER BY S.s_saveDate ASC;`,
       id,
       (error, result) => {
         if (error) return reject(error);
