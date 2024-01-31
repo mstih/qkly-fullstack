@@ -47,13 +47,13 @@ class SavedView extends React.Component {
                 const arrTime = new Date(connection.r_casPrihod);
                 const diff = arrTime - depTime;
 
-                const hours = String(Math.floor(diff / (1000 * 60 * 60)));
-                const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-                const time = `${hours}:${minutes}`
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const time = `${hours > 0 ? hours + 'h' : ''} ${minutes}min`
 
                 const date = new Date(connection.r_casOdhod);
                 const day = date.getDate();
-                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
                 const month = monthNames[date.getMonth()];
                 const year = date.getFullYear();
                 const finalDate = `${day}. ${month} ${year}`;
@@ -121,7 +121,7 @@ class SavedView extends React.Component {
                 {(this.state.status.success === false && this.state.status.message !== "") ? <p className='alert alert-danger mt-3' role='alert'>{this.state.status.message}</p> : null}
                 <div className="my-5">
                     {this.state.savedRoutes.map((route, index) => (
-                        <div className="card mb-3 shadow-sm" key={index}>
+                        <div className="card mb-3 shadow-sm p-2" key={index}>
                             <div className="row g-0">
                                 <div className="col-12">
                                     <div className="card-body pt-3 pb-2">
@@ -143,7 +143,7 @@ class SavedView extends React.Component {
                                 </div>
                                 <div className="col-md-6">
                                     <div className="card-body py-2">
-                                        <p className="card-text mb-1">Time: {route.time}h</p>
+                                        <p className="card-text mb-1">Time: {route.time}</p>
                                         <p className="card-text mb-1">Type: {route.vozilo}</p>
 
                                     </div>

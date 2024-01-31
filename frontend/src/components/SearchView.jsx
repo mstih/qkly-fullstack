@@ -27,7 +27,6 @@ class SearchView extends React.Component {
     componentDidMount() {
         axios.get(API_URL + '/kraji', { timeout: TIMEOUT })
             .then(response => {
-                // fill all three
                 this.setState({ cities: response.data, departureCities: response.data, arrivalCities: response.data }, () => console.log(this.state.cities));;
             })
             .catch(error => {
@@ -104,7 +103,6 @@ class SearchView extends React.Component {
             date: date
         }
 
-
         axios.post(API_URL + '/connections/search', data, { timeout: TIMEOUT }).then(response => {
             if (response.status !== 200) {
                 this.setState({ status: response.data.status, results: [] });
@@ -121,7 +119,7 @@ class SearchView extends React.Component {
 
                 const hours = Math.floor(diff / (1000 * 60 * 60));
                 const minutes = Math.floor((diff / (1000 * 60)) % 60);
-                const time = `${hours}:${minutes}`
+                const time = `${hours > 0 ? hours + 'h' : ''} ${minutes}min`
 
                 return {
                     ...connection,
@@ -197,12 +195,12 @@ class SearchView extends React.Component {
         const todayFull = new Date().toISOString();
         const today = todayFull.split('T')[0];
         return (
-            <div className="container mt-5">
+            <div className="container mt-4">
                 <div className="row justify-content-center">
                     <div className="col-12 col-lg-10 col-xl-8">
-                        <div className="text-center">
+                        {/* <div className="text-center">
                             <h2>Search</h2>
-                        </div>
+                        </div> */}
                         <div className="card mb-4">
                             <div className="card-body">
                                 <form onSubmit={this.handleSearch.bind(this)}>
@@ -244,23 +242,25 @@ class SearchView extends React.Component {
                                 <div className="card mb-3 " key={index}>
                                     <div className="row g-0">
                                         <div className="col-12">
-                                            <div className="card-body pt-3 pb-2">
+                                            <div className="card-body pt-3 pb-2 border-bottom mx-2">
                                                 <h5 className="card-title fs-4 m-0">
-                                                    {String(new Date(result.r_casOdhod).getHours()).padStart(2, '0')}:
-                                                    {String(new Date(result.r_casOdhod).getMinutes()).padStart(2, '0')} {" - "}
-                                                    {String(new Date(result.r_casPrihod).getHours()).padStart(2, '0')}:
-                                                    {String(new Date(result.r_casPrihod).getMinutes()).padStart(2, '0')}
+                                                    <strong>
+                                                        {String(new Date(result.r_casOdhod).getHours()).padStart(2, '0')}:
+                                                        {String(new Date(result.r_casOdhod).getMinutes()).padStart(2, '0')} {" - "}
+                                                        {String(new Date(result.r_casPrihod).getHours()).padStart(2, '0')}:
+                                                        {String(new Date(result.r_casPrihod).getMinutes()).padStart(2, '0')}
+                                                    </strong>
                                                 </h5>
                                             </div>
                                         </div>
-                                        <div className="col-md-8">
+                                        <div className="col-md-6">
                                             <div className="card-body py-2">
-                                                <p className="card-text mb-1">Time: {result.time}h</p>
+                                                <p className="card-text mb-1">Time: {result.time}</p>
                                                 <p className="card-text mb-1">Type: {result.vozilo}</p>
 
                                             </div>
                                         </div>
-                                        <div className="col-md-4">
+                                        <div className="col-md-6 mb-2">
                                             <div className="card-body py-2">
                                                 <p className="card-text mb-1">Operator: {result.izvajalec}</p>
                                                 <p className="card-text mb-1">Contact: <a target="_blank" href={`mailto:${result.kontakt}`}>{result.kontakt}</a></p>
