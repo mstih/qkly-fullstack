@@ -27,7 +27,8 @@ class SearchView extends React.Component {
     componentDidMount() {
         axios.get(API_URL + '/kraji', { timeout: TIMEOUT })
             .then(response => {
-                this.setState({ cities: response.data, departureCities: response.data, arrivalCities: response.data }, () => console.log(this.state.cities));;
+                const cities = response.data.sort((a, b) => a.k_ime.localeCompare(b.k_ime));
+                this.setState({ cities: cities, departureCities: cities, arrivalCities: cities }, () => console.log(this.state.cities));;
             })
             .catch(error => {
                 console.error('Error fetching data: ', error);
@@ -239,7 +240,7 @@ class SearchView extends React.Component {
                             role="alert">{this.state.status.message}</p> : null}
                         <div className="container mb-3">
                             {this.state.results.map((result, index) => (
-                                <div className="card mb-3 " key={index}>
+                                <div className="card mb-3 shadow-sm" key={index}>
                                     <div className="row g-0">
                                         <div className="col-12">
                                             <div className="card-body pt-3 pb-2 border-bottom mx-2">
@@ -270,8 +271,8 @@ class SearchView extends React.Component {
                                     </div>
                                     {this.state.user !== null ? (
                                         <div className="d-flex justify-content-center mb-3">
-                                            <button className="btn btn-primary me-2" onClick={() => this.handleSaveRoute(result.r_id)}>Save Route</button>
-                                            <button className="btn btn-secondary" onClick={() => this.downloadCalendarFile(result.r_id)}>Save to Calendar</button>
+                                            <button className="btn btn-primary me-2 shadow-sm" onClick={() => this.handleSaveRoute(result.r_id)}>Save Route</button>
+                                            <button className="btn btn-secondary shadow-sm" onClick={() => this.downloadCalendarFile(result.r_id)}>Save to Calendar</button>
                                         </div>
                                     ) : null}
                                 </div>

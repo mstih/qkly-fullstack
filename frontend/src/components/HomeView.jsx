@@ -26,9 +26,9 @@ export default class HomeView extends Component {
                         alt="logo"
                         className="main-image mb-4 "
                     ></img>
-                    <p className='mw-80 h3'><span className='text-primary'>Quickly</span> find all the connections between cities</p>
+                    <p className='mw-80 h3'><span className='text-primary'><strong>Quickly</strong></span> find all the connections between cities</p>
                     <div className='d-flex justify-content-between mt-4'>
-                        <button className='btn btn-white text-white border-white rounded-pill py-2 px-3 me-3 fs-5' onClick={() => this.props.setView({ view: ABOUT })}>Learn more</button>
+                        <button className='btn btn-slide border-white rounded-pill py-2 px-3 me-3 fs-5' onClick={() => this.props.setView({ view: ABOUT })}>Learn more</button>
                         <button className='btn btn-primary text-white rounded-pill py-2 px-3 fs-5' onClick={() => this.props.setView({ view: SEARCH })}>Search Connections</button>
                     </div>
                 </div>

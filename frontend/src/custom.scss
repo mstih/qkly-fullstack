@@ -24,6 +24,10 @@ body{
     border-bottom: 4px solid $primary;
 }
 
+.footer-border{
+    border-top: 3px solid $primary;
+}
+
 .greenBorderSmall{
     border-bottom: 2px solid $primary;
 }
@@ -45,4 +49,28 @@ body{
 
 .homeAnimation{
     animation: homeAnimation 1s ease-out;
+}
+
+
+@keyframes slide {
+    0% {
+      background-position: left bottom;
+    }
+    100% {
+      background-position: right bottom;
+    }
+  }
+  
+.btn-slide {
+    background: linear-gradient(to right, white 50%, transparent 50%);
+    background-size: 200% 100%;
+    background-position: right bottom;
+    transition: all 1s ease-out;
+    color: white;
+}
+  
+.btn-slide:hover {
+    background-position: left bottom;
+    color: black;
+    transition: all 0.6s ease-out;
 }
