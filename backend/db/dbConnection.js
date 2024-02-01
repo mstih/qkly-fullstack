@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
 
 // Creates connection to database with the information from .env file
-const dbConnection = mysql.createConnection({
+const dbConnection = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -12,7 +12,7 @@ const dbConnection = mysql.createConnection({
 });
 
 // Connects to database and checks for errors in connection
-dbConnection.connect((error) => {
+dbConnection.getConnection((error, connection) => {
   if (error) {
     console.log(
       "Connection to the database failed. Error: " +
@@ -23,6 +23,7 @@ dbConnection.connect((error) => {
     return;
   }
   console.log("Connected to the database\x1b[32m successfully.\x1b[0m");
+  connection.release();
 });
 
 // Stores all the database response data as a type OBJECT
