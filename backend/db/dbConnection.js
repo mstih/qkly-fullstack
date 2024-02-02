@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
 
 // Creates connection to database with the information from .env file
-const dbConnection = mysql.createConnection({
+const dbConnection = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -12,7 +12,7 @@ const dbConnection = mysql.createConnection({
 });
 
 // Connects to database and checks for errors in connection
-dbConnection.connect((error) => {
+dbConnection.getConnection((error, connection) => {
   if (error) {
     console.log(
       "Connection to the database failed. Error: " +
@@ -23,6 +23,7 @@ dbConnection.connect((error) => {
     return;
   }
   console.log("Connected to the database\x1b[32m successfully.\x1b[0m");
+  connection.release();
 });
 
 // Stores all the database response data as a type OBJECT
@@ -92,7 +93,8 @@ dataVar.searchConnections = (cityFrom, cityTo, date) => {
       JOIN Kraj K2 ON K2.k_id = P.r_prihod
       JOIN Vozilo V ON V.v_id = P.r_vozilo
       JOIN Prevoznik PR ON PR.p_id = V.v_izvajalec
-      WHERE P.r_casOdhod LIKE ? AND P.r_odhod = ? AND P.r_prihod = ?`,
+      WHERE P.r_casOdhod LIKE ? AND P.r_odhod = ? AND P.r_prihod = ?
+      ORDER BY P.r_casOdhod ASC, P.r_casPrihod ASC;`,
       [date, cityFrom, cityTo],
       (error, result) => {
         if (error) return reject(error);
@@ -163,7 +165,8 @@ dataVar.getSaved = (id) => {
       JOIN
           Prevoznik PR ON PR.p_id = V.v_izvajalec
       WHERE
-      S.u_id = ?;`,
+      S.u_id = ?
+      ORDER BY S.s_saveDate ASC;`,
       id,
       (error, result) => {
         if (error) return reject(error);

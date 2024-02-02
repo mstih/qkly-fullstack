@@ -37,23 +37,20 @@ class SavedView extends React.Component {
             now.setHours(0, 0, 0, 0);
             console.log(response.data)
             // Filter out the old saved routes
-            const noOlderConnections = response.data.filter(connection => new Date(connection.r_casOdhod) >= now);
-
-            // Sort them by their save date
-            const sorted = noOlderConnections.sort((a, b) => new Date(a.s_saveDate) - new Date(b.s_saveDate));
+            const sorted = response.data.filter(connection => new Date(connection.r_casOdhod) >= now);
 
             const withCalculations = sorted.map(connection => {
                 const depTime = new Date(connection.r_casOdhod);
                 const arrTime = new Date(connection.r_casPrihod);
                 const diff = arrTime - depTime;
 
-                const hours = String(Math.floor(diff / (1000 * 60 * 60)));
-                const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-                const time = `${hours}:${minutes}`
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const time = `${hours > 0 ? hours + 'h' : ''} ${minutes}min`
 
                 const date = new Date(connection.r_casOdhod);
                 const day = date.getDate();
-                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
                 const month = monthNames[date.getMonth()];
                 const year = date.getFullYear();
                 const finalDate = `${day}. ${month} ${year}`;
@@ -121,29 +118,34 @@ class SavedView extends React.Component {
                 {(this.state.status.success === false && this.state.status.message !== "") ? <p className='alert alert-danger mt-3' role='alert'>{this.state.status.message}</p> : null}
                 <div className="my-5">
                     {this.state.savedRoutes.map((route, index) => (
-                        <div className="card mb-3" key={index}>
+                        <div className="card mb-3 shadow-sm p-2 " key={index}>
                             <div className="row g-0">
                                 <div className="col-12">
                                     <div className="card-body pt-3 pb-2">
-                                        <h5 className="card-title fs-4 m-0">
-                                            {route.date + ": "}
-                                            <strong>
-                                                {String(new Date(route.r_casOdhod).getHours()).padStart(2, '0')}:
-                                                {String(new Date(route.r_casOdhod).getMinutes()).padStart(2, '0')} -
-                                                {String(new Date(route.r_casPrihod).getHours()).padStart(2, '0')}:
-                                                {String(new Date(route.r_casPrihod).getMinutes()).padStart(2, '0')}
-                                            </strong>
-                                        </h5>
+                                        <div className="d-flex flex-column flex-md-row justify-content-md-between pb-2 border-bottom">
+                                            <h5 className="card-title fs-4 m-0">
+                                                {route.k_odhod} - {route.k_prihod}
+                                            </h5>
+                                            <h5 className="card-title fs-4 m-0">
+                                                {route.date + ": "}
+                                                <strong>
+                                                    {String(new Date(route.r_casOdhod).getHours()).padStart(2, '0')}:
+                                                    {String(new Date(route.r_casOdhod).getMinutes()).padStart(2, '0')} {" - "}
+                                                    {String(new Date(route.r_casPrihod).getHours()).padStart(2, '0')}:
+                                                    {String(new Date(route.r_casPrihod).getMinutes()).padStart(2, '0')}
+                                                </strong>
+                                            </h5>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col-md-8">
+                                <div className="col-md-6">
                                     <div className="card-body py-2">
-                                        <p className="card-text mb-1">Time: {route.time}h</p>
+                                        <p className="card-text mb-1">Time: {route.time}</p>
                                         <p className="card-text mb-1">Type: {route.vozilo}</p>
 
                                     </div>
                                 </div>
-                                <div className="col-md-4">
+                                <div className="col-md-6">
                                     <div className="card-body py-2">
                                         <p className="card-text mb-1">Operator: {route.izvajalec}</p>
                                         <p className="card-text mb-1">Contact: <a href={`mailto:${route.kontakt}`}>{route.kontakt}</a></p>
@@ -151,7 +153,7 @@ class SavedView extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="d-flex justify-content-center mb-3">
+                            <div className="d-flex justify-content-center mb-3 mt-3">
                                 <button className="btn btn-danger me-2 shadow" onClick={() => this.deleteSavedRoute(route.r_id)}>Delete from Saved</button>
                                 <button className="btn btn-secondary shadow" onClick={() => this.downloadCalendarFile(route.r_id)}>Save to Calendar</button>
                             </div>
