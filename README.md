@@ -5,6 +5,7 @@ Qkly(quickly) is a full-stack web application that combines buses, trains, and r
 ## Access
 It's currently under development and will be available soon.
 <br>
+![Screenshot](screenshots/qkly-search-V0.2.png)
 
 
 ## Features
